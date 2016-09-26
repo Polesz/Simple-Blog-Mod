@@ -25,13 +25,13 @@ class SimipleBlogAdmin extends AdminSimpleBlogPage{
 	 * @param string $current
 	 */
 	function Heading($current){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		$options = array(
-			'Admin_Blog'			=> 'Posts',
+			'Admin_Blog'			=> $blogmsg['Posts'],
 			'Admin_BlogConfig'		=> $langmessage['configuration'],
-			'Admin_BlogCategories'	=> 'Categories',
-			'Admin_BlogComments'	=> gpOutput::SelectText('Comments'),
+			'Admin_BlogCategories'	=> $blogmsg['Categories'],
+			'Admin_BlogComments'	=> $blogmsg['Comments'],
 			);
 
 		$links = array();
@@ -43,10 +43,10 @@ class SimipleBlogAdmin extends AdminSimpleBlogPage{
 			}
 		}
 
-		echo common::Link('Admin_Blog','New Blog Post','cmd=new_form',' class="gpsubmit" style="float:right"');
+		echo common::Link('Admin_Blog',$blogmsg['New Blog Post'],'cmd=new_form',' class="gpsubmit" style="float:right"');
 
 		echo '<h2 class="hmargin">';
-		$label = gpOutput::SelectText('Blog');
+		$label = $blogmsg['Blog'];
 		echo common::Link('Special_Blog',$label);
 		echo ' &#187; ';
 		echo implode('<span>|</span>',$links);

@@ -9,6 +9,8 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 
 	public function __construct(){
 		global $langmessage, $page;
+		
+
 		parent::__construct();
 
 
@@ -57,7 +59,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	public function ShowPosts(){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		$this->Heading('Admin_Blog');
 
@@ -102,9 +104,9 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 
 
 		echo '<table class="bordered full_width striped">';
-		echo '<thead><tr><th></th><th>Posts ('.number_format($total_posts).')';
-		echo '</th><th>Publish Time</th><th>Comments</th>';
-		echo '<th>Options</th>';
+		echo '<thead><tr><th></th><th>'.$blogmsg['Posts'].' ('.number_format($total_posts).')';
+		echo '</th><th>'.$blogmsg['Publish Time'].'</th><th>'.$blogmsg['Comments'].'</th>';
+		echo '<th>'.$blogmsg['Options'].'</th>';
 		echo '</tr></thead>';
 		echo '<tbody>';
 		foreach($post_ids as $i => $post_id){
@@ -112,9 +114,9 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 			//draft/pending
 			echo '<tr><td width="1%">';
 			if( isset($post_drafts[$post_id]) ){
-				echo 'Draft';
+				echo $blogmsg['Draft'];
 			}elseif( $post_times[$post_id] > time() ){
-				echo 'Pending';
+				echo $blogmsg['Pending'];
 			}
 
 			//title
@@ -141,25 +143,25 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 
 			if( SimpleBlogCommon::$data['allow_comments'] ){
 				$comments_closed	= SimpleBlogCommon::AStrGet('comments_closed',$post_id);
-				$open				= gpOutput::SelectText('Open');
-				$close				= gpOutput::SelectText('Close');
+				$open				= $blogmsg['Open'];
+				$close				= $blogmsg['Close'];
 
 				if( $comments_closed ){
 					echo common::Link('Admin_Blog',$open,'cmd=opencomments&id='.$post_id,'name="cnreq"');
 					echo ' &nbsp; ';
-					echo gpOutput::SelectText('Closed');
+					echo $blogmsg['Closed'];
 				}else{
 					echo $open;
 					echo ' &nbsp; ';
 					echo common::Link('Admin_Blog',$close,'cmd=closecomments&id='.$post_id,'name="cnreq"');
 				}
 			}else{
-				echo common::Link('Admin_BlogConfig','Disabled');
+				echo common::Link('Admin_BlogConfig',$blogmsg['Disabled']);
 			}
 
 
 			echo '</td><td>';
-			echo SimpleBlogCommon::PostLink($post_id,'View Post');
+			echo SimpleBlogCommon::PostLink($post_id,$blogmsg['View Post']);
 			echo ' &nbsp; ';
 			echo common::Link('Admin_Blog/'.$post_id,$langmessage['edit'],'cmd=edit_post');
 			echo ' &nbsp; ';
@@ -177,10 +179,10 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	public function AdminPost($id){
-		global $langmessage;
+		global $langmessage,$blogmsg;
 
 		if( !ctype_digit($id) ){
-			message($langmessage['OOPS'].' (Invalid Request)');
+			message($langmessage['OOPS'].$blogmsg[' (Invalid Request)']);
 			return false;
 		}
 
@@ -188,7 +190,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		$this->post_id			= $id;
 		$this->post				= SimpleBlogCommon::GetPostContent($id);
 		if( !$this->post ){
-			message($langmessage['OOPS'].' (No Post)');
+			message($langmessage['OOPS'].$blogmsg[' (No Post)']);
 			return false;
 		}
 
@@ -218,7 +220,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	private function EditPost(){
-		global $langmessage, $page;
+		global $langmessage, $page, $blogmsg;
 
 
 
@@ -226,7 +228,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		$post				= $this->post;
 		$_POST				+= $post;
 
-		$this->PostForm('Edit Post',$_POST,'save_edit',$this->post_id);
+		$this->PostForm($blogmsg['Edit Post'],$_POST,'save_edit',$this->post_id);
 	}
 
 
@@ -235,7 +237,8 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	private function NewForm(){
-		$this->PostForm('New Blog Post',$_POST);
+ 		global $blogmsg;
+		$this->PostForm($blogmsg['New Blog Post'],$_POST);
 	}
 
 
@@ -248,7 +251,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 * @param int|string $post_id
 	 */
 	private function PostForm($label,&$array,$cmd='save_new',$post_id=null){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		includeFile('tool/editing.php');
 
@@ -273,7 +276,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		echo common::Link('Admin_Blog',$langmessage['cancel'],'',' class="gpcancel"');
 
 		if( $post_id ){
-			echo SimpleBlogCommon::PostLink($post_id,'View Post','','target="_blank"');
+			echo SimpleBlogCommon::PostLink($post_id,$blogmsg['View Post'],'','target="_blank"');
 		}
 
 
@@ -291,12 +294,12 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		echo '<div class="sb_edit_box">';
 
 		echo '<div class="sb_edit_group">';
-		echo '<label>Title</label>';
+		echo '<label>'.$blogmsg['Title'].'</label>';
 		echo '<input type="text" name="title" value="'.$array['title'].'" required class="gpinput" />';
 		echo '</div>';
 
 		echo '<div class="sb_edit_group">';
-		echo '<label>Sub-Title</label>';
+		echo '<label>'.$blogmsg['Sub-Title'].'</label>';
 		echo '<input type="text" name="subtitle" value="'.$array['subtitle'].'" class="gpinput" />';
 		echo '</div>';
 
@@ -310,7 +313,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		echo '<label>';
 		echo '<input type="checkbox" name="isDraft" value="on" data-cmd="DraftCheckbox" ';
 		if( $array['isDraft'] ) echo 'checked="true"';
-		echo '" /> Draft</label>';
+		echo '" /> '.$blogmsg['Draft'].'</label>';
 		echo '</div>';
 
 		$this->FieldPublish($array);
@@ -351,6 +354,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	public function FieldPublish($array){
+		global $blogmsg;
 
 		$style = '';
 		if( $array['isDraft'] ){
@@ -358,14 +362,15 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		}
 
 		echo '<div class="sb_edit_group" id="sb_field_publish" '.$style.'>';
-		echo '<label>Publish Time</label>';
+		echo '<label>'.$blogmsg['Publish Time'].'</label>';
 
 
 		//month
 		$pub_month	= date('n',$array['time']);
-		$months		= array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+//		$months		= array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		$months		= $blogmsg['Months'];
 
-		echo '<select name="pub_month" style="width:4.3em">';
+		echo '<select name="pub_month" style="width:7em">';
 		for($i = 1; $i <= 12; $i++){
 			$selected = '';
 			if( $i == $pub_month ){
@@ -430,12 +435,12 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	private function SaveEdit(){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 
 		//save to data file
 		if( !self::SavePost($this->post_id, $this->post) ){
-			message($langmessage['OOPS'].' (Post not saved)');
+			message($langmessage['OOPS'].$blogmsg[' (Post not saved)']);
 			return false;
 		}
 
@@ -451,7 +456,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	public static function SavePost($post_id, $post){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		$_POST			+= array('title'=>'', 'content'=>'', 'subtitle'=>'', 'isDraft'=>'','category'=>array());
 		$title			= htmlspecialchars($_POST['title']);
@@ -507,7 +512,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 		self::UpdatePostCategories($post_id);	//find and update the edited post in categories and archives
 
 		if( !SimpleBlogCommon::SaveIndex() ){
-			message($langmessage['OOPS'].' (Index not saved)');
+			message($langmessage['OOPS'].$blogmsg[' (Index not saved)']);
 			return false;
 		}
 
@@ -540,10 +545,11 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 	 *
 	 */
 	public static function ShowCategoryList( $post_id, $post ){
+		global $blogmsg;
 
 		$_POST += array('category'=>array());
 
-		echo '<label>Category</label>';
+		echo '<label>'.$blogmsg['Category'].'</label>';
 		echo '<select name="category[]" multiple="multiple"  class="gpinput">';
 
 		$categories = SimpleBlogCommon::AStrToArray( 'categories' );
@@ -558,7 +564,7 @@ class AdminSimpleBlogPosts extends SimipleBlogAdmin{
 			}
 
 			if( SimpleBlogCommon::AStrGet('categories_hidden', $catindex) ){
-				$label .= ' (Hidden)';
+				$label .= $blogmsg[' (Hidden)'];
 			}
 
 			echo '<option value="'.$catindex.'" '.$selected.'>'.$label.'</option>';

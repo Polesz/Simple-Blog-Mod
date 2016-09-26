@@ -6,7 +6,7 @@ gpPlugin_incl('SimpleBlogCommon.php');
 class SimpleBlogCategories{
 
 	function __construct(){
-		global $addonPathData;
+		global $addonPathData, $blogmsg;
 
 		SimpleBlogCommon::AddCSS();
 
@@ -29,7 +29,7 @@ class SimpleBlogCategories{
 
 		echo '<div class="simple_blog_gadget"><div>';
 		echo '<span class="simple_blog_gadget_label">';
-		echo gpOutput::GetAddonText('Categories');
+		echo $blogmsg['Categories'];
 		echo '</span>';
 		echo $content;
 		echo '</div></div>';

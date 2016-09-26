@@ -10,7 +10,7 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 
 
 	function __construct(){
-		global $langmessage, $addonRelativeCode, $addonFolderName, $page;
+		global $langmessage, $addonRelativeCode, $addonFolderName, $page, $blogmsg;
 
 		parent::__construct();
 
@@ -42,7 +42,7 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 		// print all categories and settings
 		echo '<form name="categories" action="'.common::GetUrl('Admin_BlogCategories').'" method="post">';
 		echo '<table class="bordered">';
-		echo '<tr><th>&nbsp;</th><th>Category</th><th>Number of Posts</th><th>Visible</th><th>Options</th></tr>';
+		echo '<tr><th>&nbsp;</th><th>'.$blogmsg['Category'].'</th><th>'.$blogmsg['Number of Posts'].'</th><th>'.$blogmsg['Visible'].'</th><th>'.$blogmsg['Options'].'</th></tr>';
 
 		echo '<tbody class="sortable_table">';
 		foreach( $this->categories as $catindex => $catname ){
@@ -64,7 +64,7 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 
 			echo ' <input type="checkbox" name="catvis['.$catindex.']"'.$checked.'/> ';
 			echo '</td><td>';
-			echo common::Link('Admin_BlogCategories',$langmessage['delete'],'cmd=delete_category&index='.$catindex,' name="postlink" class="gpconfirm" title="Delete this Category?" ');
+			echo common::Link('Admin_BlogCategories',$langmessage['delete'],'cmd=delete_category&index='.$catindex,' name="postlink" class="gpconfirm" title="'.$blogmsg['Delete this Category?'].'" ');
 			echo '</td></tr>';
 		}
 		echo '</tbody>';
@@ -74,7 +74,7 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 		echo '<input type="hidden" name="cmd" value="save_categories" />';
 		echo '<input type="submit" value="'.$langmessage['save_changes'].'" class="gpsubmit"/>';
 		echo ' &nbsp; ';
-		echo common::Link('Admin_BlogCategories','Add New Category','cmd=new_category',' name="gpabox" ');
+		echo common::Link('Admin_BlogCategories',$blogmsg['Add New Category'],'cmd=new_category',' name="gpabox" ');
 		echo '</p>';
 		echo '</form>';
 
@@ -153,7 +153,7 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 
 		$new_title = htmlspecialchars(trim($_POST['new_category']));
 		if( empty($new_title) ){
-			message($langmessage['OOPS'].' (Empty category title)');
+			message($langmessage['OOPS'].$blogmsg[' (Empty category title)']);
 			return false;
 		}
 
@@ -179,7 +179,7 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 	function NewCategory(){
 		global $langmessage;
 		echo '<div class="inline_box">';
-		echo '<h3>Add New Category</h3>';
+		echo '<h3>'.$blogmsg['Add New Category'].'</h3>';
 		echo '<form name="addcategory" action="'.common::GetUrl('Admin_BlogCategories').'" method="post">';
 		echo '<p>';
 		echo '<input type="hidden" name="cmd" value="save_new_category" />';
@@ -215,16 +215,16 @@ class AdminSimpleBlogCategories extends SimipleBlogAdmin{
 	 *
 	 */
 	function DeleteCategory(){
-		global $langmessage;
+		global $langmessage,$blogmsg;
 
 		if( !isset($_POST['index']) ){
-			message($langmessage['OOPS'].' (Invalid Index)');
+			message($langmessage['OOPS'].$blogmsg[' (Invalid Index)']);
 			return false;
 		}
 
 		$index = $_POST['index'];
 		if( !isset($this->categories[$index]) ){
-			message($langmessage['OOPS'].' (Invalid Index)');
+			message($langmessage['OOPS'].$blogmsg[' (Invalid Index)']);
 			return false;
 		}
 

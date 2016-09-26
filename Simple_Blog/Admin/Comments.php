@@ -32,7 +32,7 @@ class SimpleBlogComments extends SimipleBlogAdmin{
 	}
 
 	function ShowRecent(){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 
 		$this->Heading('Admin_BlogComments');
@@ -40,11 +40,11 @@ class SimpleBlogComments extends SimipleBlogAdmin{
 
 		echo '<table style="width:100%" class="bordered">';
 		echo '<tr><th>';
-		echo 'Comment';
+		echo $blogmsg['Comment'];
 		echo '</th><th>';
-		echo 'Time / Website';
+		echo $blogmsg['Time / Website'];
 		echo '</th><th>';
-		echo 'Options';
+		echo $blogmsg['Options'];
 		echo '</th></tr>';
 
 		uasort($this->cache, array('SimpleBlogComments','Sort') );

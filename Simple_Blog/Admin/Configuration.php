@@ -99,7 +99,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 	 *
 	 */
 	function Config(){
-		global $langmessage, $addonFolderName, $gpversion;
+		global $langmessage, $addonFolderName, $gpversion, $blogmsg;
 
 
 		$defaults = SimpleBlogCommon::Defaults();
@@ -113,22 +113,22 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 		echo '<form class="renameform" action="'.common::GetUrl('Admin_BlogConfig').'" method="post">';
 		echo '<table class="bordered full_width">';
 		echo '<tr><th>';
-		echo 'Option';
+		echo $blogmsg['Option'];
 		echo '</th><th>';
-		echo 'Value';
+		echo $blogmsg['Value'];
 		echo '</th><th>';
-		echo 'Default';
+		echo $blogmsg['Default'];
 		echo '</th></tr>';
 
 
 		$options = self::Options();
 
 		//Pretty Urls
-		echo '<tr><td>Urls</td><td>';
+		echo '<tr><td>'.$blogmsg['Urls'].'</td><td>';
 		if( version_compare($gpversion,'4.0','>=') ){
 			self::Radio('urls',$options['urls'],$array['urls']);
 		}else{
-			echo 'Available in gpEasy 4.0+';
+			echo $blogmsg['Available in gpEasy 4.0+'];
 		}
 		echo '</td><td>';
 		echo $defaults['urls'];
@@ -137,9 +137,9 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Date Format
 		echo '<tr><td>';
-		echo 'Date Format';
+		echo $blogmsg['Date Format'];
 		//echo ' (<a href="http://php.net/manual/en/function.date.php" target="_blank">About</a>)';
-		echo ' (<a href="http://www.php.net/manual/en/function.strftime.php" target="_blank">About</a>)';
+		echo ' (<a href="http://www.php.net/manual/en/function.strftime.php" target="_blank">'.$blogmsg['About'].'</a>)';
 		echo '</td><td>';
 		//echo '<input type="text" name="date_format" size="20" value="'.htmlspecialchars($array['date_format']).'" class="gpinput" />';
 		echo '<input type="text" name="strftime_format" value="'.htmlspecialchars($array['strftime_format']).'" class="gpinput" />';
@@ -150,7 +150,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Subtitle Separator
 		echo '<tr><td>';
-		echo 'Subtitle Separator';
+		echo $blogmsg['Subtitle Separator'];
 		echo '</td><td>';
 		echo '<input type="text" name="subtitle_separator" size="20" value="'.htmlspecialchars($array['subtitle_separator']).'" class="gpinput" />';
 		echo '</td><td>';
@@ -159,7 +159,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 
 		//Entries Per Page
-		echo '<tr><td>Entries Per Page</td><td>';
+		echo '<tr><td>'.$blogmsg['Entries Per Page'].'</td><td>';
 		echo '<input type="text" name="per_page" value="'.htmlspecialchars($array['per_page']).'" class="gpinput" />';
 		echo '</td><td>';
 		echo $defaults['per_page'];
@@ -168,7 +168,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Entries Abbreviation Length
 		echo '<tr><td>';
-		echo 'Entries Abbreviation Length';
+		echo $blogmsg['Entries Abbreviation Length'];
 		echo '</td><td>';
 		echo '<input type="text" name="post_abbrev" value="'.htmlspecialchars($array['post_abbrev']).'" class="gpinput" />';
 		echo '</td><td>';
@@ -178,7 +178,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Image in Abbrevation
 		echo '<tr><td>';
-		echo 'Image in Abbrevation';
+		echo $blogmsg['Image in Abbrevation'];
 		echo '</td><td>';
 		if( $array['abbrev_image'] ){
 			echo '<input type="checkbox" name="abbrev_image" value="allow" checked="checked" />';
@@ -190,7 +190,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Categories in Abbreviation
 		echo '<tr><td>';
-		echo 'Categories in Abbrevation';
+		echo $blogmsg['Categories in Abbrevation'];
 		echo '</td><td>';
 		if( $array['abbrev_cat'] ){
 			echo '<input type="checkbox" name="abbrev_cat" value="allow" checked="checked" />';
@@ -202,12 +202,12 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Comments
 		echo '<tr><th colspan="3">';
-		echo 'Gadget';
+		echo $blogmsg['Gadget'];
 		echo '</th></tr>';
 
 		//Entries For Gadget
 		echo '<tr><td>';
-		echo 'Entries For Gadget';
+		echo $blogmsg['Entries For Gadget'];
 		echo '</td><td>';
 		echo '<input type="text" name="gadget_entries" value="'.htmlspecialchars($array['gadget_entries']).'" class="gpinput" />';
 		echo '</td><td>';
@@ -217,7 +217,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Gadget Abbreviation Length
 		echo '<tr><td>';
-		echo 'Gadget Abbreviation Length';
+		echo $blogmsg['Gadget Abbreviation Length'];
 		echo '</td><td>';
 		echo '<input type="text" name="gadget_abbrev" value="'.htmlspecialchars($array['gadget_abbrev']).'" class="gpinput" />';
 		echo '</td><td>';
@@ -227,12 +227,12 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Comments
 		echo '<tr><th colspan="3">';
-		echo 'Feed';
+		echo $blogmsg['Feed'];
 		echo '</th></tr>';
 
 		//Entries For Feed
 		echo '<tr><td>';
-		echo 'Entries For Feed';
+		echo $blogmsg['Entries For Feed'];
 		echo '</td><td>';
 		echo '<input type="text" name="feed_entries" value="'.htmlspecialchars($array['feed_entries']).'" class="gpinput" />';
 		echo '</td><td>';
@@ -242,7 +242,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Feed Abbreviation Length
 		echo '<tr><td>';
-		echo 'Feed Abbreviation Length';
+		echo $blogmsg['Feed Abbreviation Length'];
 		echo '</td><td>';
 		echo '<input type="text" name="feed_abbrev" size="20" value="'.htmlspecialchars($array['feed_abbrev']).'" class="gpinput" />';
 		echo '</td><td>';
@@ -252,13 +252,13 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Comments
 		echo '<tr><th colspan="3">';
-		echo 'Comments';
+		echo $blogmsg['Comments'];
 		echo '</th></tr>';
 
 
 		//Allow Comments
 		echo '<tr><td>';
-		echo 'Allow Comments';
+		echo $blogmsg['Allow Comments'];
 		echo '</td><td>';
 		if( $array['allow_comments'] ){
 			echo '<input type="checkbox" name="allow_comments" value="allow" checked="checked" />';
@@ -270,7 +270,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 		//Email New Comment
 		echo '<tr><td>';
-		echo 'Email New Comments';
+		echo $blogmsg['Email New Comments'];
 		echo '</td><td>';
 		echo '<input type="text" name="email_comments" value="'.htmlspecialchars($array['email_comments']).'"  />';
 		echo '</td><td></td></tr>';
@@ -278,7 +278,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 
 
 		echo '<tr><td>';
-		echo 'Commenter Website';
+		echo $blogmsg['Commenter Website'];
 		echo '</td><td>';
 		echo '<select name="commenter_website" class="gpselect">';
 			if( $array['commenter_website'] == 'nofollow' ){
@@ -290,17 +290,17 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 				echo '<option value="nofollow" selected="selected">Nofollow Link</option>';
 				echo '<option value="link" selected="selected">Follow Link</option>';
 			}else{
-				echo '<option value="">Hide</option>';
-				echo '<option value="nofollow">Nofollow Link</option>';
-				echo '<option value="link">Follow Link</option>';
+				echo '<option value="">'.$blogmsg['Hide'].'</option>';
+				echo '<option value="nofollow">'.$blogmsg['Nofollow Link'].'</option>';
+				echo '<option value="link">'.$blogmsg['Follow Link'].'</option>';
 			}
 		echo '</select>';
 		echo '</td><td>';
-		echo 'Hide';
+		echo $blogmsg['Hide'];
 		echo '</td></tr>';
 
 		echo '<tr><td>';
-		echo 'reCaptcha';
+		echo $blogmsg['reCaptcha'];
 		echo '</td><td>';
 
 		if( !gp_recaptcha::isActive() ){
@@ -331,7 +331,7 @@ class AdminSimpleBlogConfig extends SimipleBlogAdmin{
 		echo '<p style="text-align:center">';
 			echo common::Link('Admin_Theme_Content',$langmessage['editable_text'],'cmd=addontext&addon='.urlencode($addonFolderName),' title="'.urlencode($langmessage['editable_text']).'" name="gpabox" ');
 			echo ' &nbsp; &nbsp; ';
-			echo common::Link('Admin_BlogConfig','Regenerate Gadget','cmd=regen',' name="creq"');
+			echo common::Link('Admin_BlogConfig',$blogmsg['Regenerate Gadget'],'cmd=regen',' name="creq"');
 		echo '</p>';
 
 		echo '</form>';

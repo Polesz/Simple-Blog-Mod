@@ -39,7 +39,7 @@ class SimpleBlogPage{
 	}
 
 	public function _ShowPost(){
-		global $page;
+		global $page, $blogmsg;
 
 		$page->label = SimpleBlogCommon::Underscores( $this->post['title'] );
 
@@ -54,11 +54,11 @@ class SimpleBlogPage{
 		$header			= '<h2 id="blog_post_'.$this->post_id.'">';
 		if( SimpleBlogCommon::AStrGet('drafts',$this->post_id) ){
 			$header		.= '<span style="opacity:0.3;">';
-			$header		.= gpOutput::SelectText('Draft');
+			$header		.= $blogmsg['Draft'];
 			$header		.= '</span> ';
 		}elseif( $this->post['time'] > time() ){
 			$header .= '<span style="opacity:0.3;">';
-			$header .= gpOutput::SelectText('Pending');
+			$header .= $blogmsg['Pending'];
 			$header .= '</span> ';
 		}
 
@@ -119,6 +119,7 @@ class SimpleBlogPage{
 	 *
 	 */
 	public function Categories(){
+		global $blogmsg;
 
 		//blog categories
 		if( empty($this->post['categories']) ){
@@ -140,7 +141,7 @@ class SimpleBlogPage{
 		if( count($temp) ){
 			echo '<div class="category_container">';
 			echo '<b>';
-			echo gpOutput::GetAddonText('Categories');
+			echo $blogmsg['Categories'];
 			echo ':</b> ';
 			echo implode(', ',$temp);
 			echo '</div>';
@@ -172,6 +173,7 @@ class SimpleBlogPage{
 	 *
 	 */
 	public function ShowComments(){
+		global $blogmsg;
 
 		$data = SimpleBlogCommon::GetCommentData($this->post_id);
 		if( empty($data) ){
@@ -179,7 +181,7 @@ class SimpleBlogPage{
 		}
 
 		echo '<h3>';
-		echo gpOutput::GetAddonText('Comments');
+		echo $blogmsg['Comments'];
 		echo '</h3>';
 
 		$this->GetCommentHtml($data);
@@ -236,16 +238,16 @@ class SimpleBlogPage{
 	 *
 	 */
 	protected function GetPostedComment(){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		if( empty($_POST['name']) ){
-			$field = gpOutput::SelectText('Name');
+			$field = $blogmsg['Name'];
 			message($langmessage['OOPS_REQUIRED'],$field);
 			return false;
 		}
 
 		if( empty($_POST['comment']) ){
-			$field = gpOutput::SelectText('Comment');
+			$field = $blogmsg['Comment'];
 			message($langmessage['OOPS_REQUIRED'],$field);
 			return false;
 		}
@@ -275,7 +277,7 @@ class SimpleBlogPage{
 	 *
 	 */
 	protected function EmailComment($comment){
-		global $gp_mailer;
+		global $gp_mailer, $blogmsg;
 
 		if( empty(SimpleBlogCommon::$data['email_comments']) ){
 			return;
@@ -293,7 +295,7 @@ class SimpleBlogPage{
 		}
 		$body .= '<p>'.$comment['comment'].'</p>';
 
-		$gp_mailer->SendEmail(SimpleBlogCommon::$data['email_comments'], 'New Comment', $body);
+		$gp_mailer->SendEmail(SimpleBlogCommon::$data['email_comments'],  $blogmsg['New Comment'], $body);
 
 	}
 
@@ -355,10 +357,11 @@ class SimpleBlogPage{
 	 *
 	 */
 	public function CommentForm(){
+		global $blogmsg;
 
 		if( $this->comments_closed ){
 			echo '<div class="comments_closed">';
-			echo gpOutput::GetAddonText('Comments have been closed.');
+			echo $blogmsg['Comments have been closed.'];
 			echo '</div>';
 			return;
 		}
@@ -371,7 +374,7 @@ class SimpleBlogPage{
 		$_POST += array('name'=>'','website'=>'http://','comment'=>'');
 
 		echo '<h3>';
-		echo gpOutput::GetAddonText('Leave Comment');
+		echo $blogmsg['Leave Comment'];
 		echo '</h3>';
 
 
@@ -381,7 +384,7 @@ class SimpleBlogPage{
 		//name
 		echo '<li>';
 		echo '<label>';
-		echo gpOutput::GetAddonText('Name');
+		echo $blogmsg['Name'];
 		echo '</label><br/>';
 		echo '<input type="text" name="name" class="text" value="'.htmlspecialchars($_POST['name']).'" />';
 		echo '</li>';
@@ -390,7 +393,7 @@ class SimpleBlogPage{
 		if( !empty(SimpleBlogCommon::$data['commenter_website']) ){
 			echo '<li>';
 			echo '<label>';
-			echo gpOutput::GetAddonText('Website');
+			echo $blogmsg['Website'];
 			echo '</label><br/>';
 			echo '<input type="text" name="website" class="text" value="'.htmlspecialchars($_POST['website']).'" />';
 			echo '</li>';
@@ -400,7 +403,7 @@ class SimpleBlogPage{
 		//comment
 		echo '<li>';
 		echo '<label>';
-		echo gpOutput::ReturnText('Comment');
+		echo $blogmsg['Comment'];
 		echo '</label><br/>';
 		echo '<textarea name="comment" cols="30" rows="7" >';
 		echo htmlspecialchars($_POST['comment']);
@@ -422,8 +425,9 @@ class SimpleBlogPage{
 		//submit button
 		echo '<li>';
 		echo '<input type="hidden" name="cmd" value="Add Comment" />';
-		$html = '<input type="submit" name="" class="submit" value="%s" />';
-		echo gpOutput::GetAddonText('Add Comment',$html);
+//		$html = '<input type="submit" name="" class="submit" value="%s" />';
+//		echo gpOutput::GetAddonText('Add Comment',$html);
+		echo '<input type="submit" name="" class="submit" value="'.$blogmsg['Add Comment'].'" />';
 		echo '</li>';
 
 		echo '</ul>';
@@ -448,6 +452,7 @@ class SimpleBlogPage{
 	 *
 	 */
 	public function PostLinks(){
+		global $blogmsg;
 
 		$post_key = SimpleBlogCommon::AStrKey('str_index',$this->post_id);
 
@@ -455,9 +460,10 @@ class SimpleBlogPage{
 
 
 		//blog home
-		$html = common::Link('Special_Blog','%s','','class="blog_home"');
-		echo gpOutput::GetAddonText('Blog Home',$html);
-		echo '&nbsp;';
+//		$html = common::Link('Special_Blog','%s','','class="blog_home"');
+//		echo gpOutput::GetAddonText('Blog Home',$html);
+		echo common::Link('Special_Blog',$blogmsg['Blog Home'],'','class="blog_home"');
+		echo '&nbsp;|&nbsp;';
 
 
 		// check for newer posts and if post is draft
@@ -474,9 +480,10 @@ class SimpleBlogPage{
 			}while( $isDraft );
 
 			if( !$isDraft ){
-				$html = SimpleBlogCommon::PostLink($next_index,'%s','','class="blog_newer"');
-				echo gpOutput::GetAddonText('Newer Entry',$html);
-				echo '&nbsp;';
+//				$html = SimpleBlogCommon::PostLink($next_index,'%s','','class="blog_newer"');
+//				echo gpOutput::GetAddonText('Newer Entry',$html);
+				echo common::Link($next_index,$blogmsg['Newer Entry'],'','class="blog_older"');
+				echo '&nbsp;|&nbsp;';
 			}
 		}
 
@@ -497,20 +504,20 @@ class SimpleBlogPage{
 			}
 
 			if( !$isDraft ){
-				$html = SimpleBlogCommon::PostLink($prev_index,'%s','','class="blog_older"');
-				echo gpOutput::GetAddonText('Older Entry',$html);
+//				$html = SimpleBlogCommon::PostLink($prev_index,'%s','','class="blog_older"');
+//				echo gpOutput::GetAddonText('Older Entry',$html);
+				echo common::Link($prev_index,$blogmsg['Older Entry'],'','class="blog_older"');
 			}
 
 		}while( $isDraft );
 
 
 		if( common::LoggedIn() ){
-			echo '&nbsp;';
-			echo common::Link('Admin_Blog','New Post','cmd=new_form','class="blog_post_new"');
+			echo '&nbsp;|&nbsp;';
+			echo common::Link('Admin_Blog',$blogmsg['New Post'],'cmd=new_form','class="blog_post_new"');
 		}
 
 		echo '</p>';
 	}
 
 }
-

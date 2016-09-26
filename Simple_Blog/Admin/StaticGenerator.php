@@ -21,7 +21,7 @@ class StaticGenerator{
 	 *
 	 */
 	static function GenFeed(){
-		global $config, $addonFolderName, $dirPrefix;
+		global $config, $addonFolderName, $dirPrefix, $blogmsg;
 		ob_start();
 
 		$atomFormat = 'Y-m-d\TH:i:s\Z';
@@ -63,7 +63,7 @@ class StaticGenerator{
 			$content =& $post['content'];
 			if( (SimpleBlogCommon::$data['feed_abbrev']> 0) && (mb_strlen($content) > SimpleBlogCommon::$data['feed_abbrev']) ){
 				$content = mb_substr($content,0,SimpleBlogCommon::$data['feed_abbrev']).' ... ';
-				$label = gpOutput::SelectText('Read More');
+				$label = $blogmsg['Read More'];
 				$content .= '<a href="'.$server.SimpleBlogCommon::PostUrl($post_index,$label).'">'.$label.'</a>';
 			}
 
@@ -100,14 +100,14 @@ class StaticGenerator{
 	 *
 	 */
 	static function GenGadget(){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		$posts = array();
 		$show_posts = SimpleBlogCommon::WhichPosts(0,SimpleBlogCommon::$data['gadget_entries']);
 
 
 		ob_start();
-		$label = gpOutput::SelectText('Blog');
+		$label = $blogmsg['Blog'];
 		if( !empty($label) ){
 			echo '<h3>';
 			echo common::Link('Special_Blog',$label);
@@ -142,7 +142,7 @@ class StaticGenerator{
 				}
 				$content = mb_substr($content,0,$cut).' ... ';
 
-				$label = gpOutput::SelectText('Read More');
+				$label = $blogmsg['Read More'];
 				$content .= SimpleBlogCommon::PostLink($post_index,$label);
 			}
 
@@ -154,7 +154,7 @@ class StaticGenerator{
 
 		if( SimpleBlogCommon::$data['post_count'] > 3 ){
 
-			$label = gpOutput::SelectText('More Blog Entries');
+			$label = $blogmsg['More Blog Entries'];
 			echo common::Link('Special_Blog',$label);
 		}
 
@@ -215,7 +215,6 @@ class StaticGenerator{
 	 */
 	static function GenArchiveGadget(){
 		global $addonPathData;
-
 		//get list of posts and times
 		$list = SimpleBlogCommon::AStrToArray( 'post_times' );
 		if( !count($list) ) return;

@@ -13,7 +13,7 @@ class SimpleBlog extends SimpleBlogCommon{
 	public $showing_category = false;
 
 	public function __construct(){
-		global $page, $langmessage, $addonFolderName;
+		global $page, $langmessage, $addonFolderName,$blogmsg;
 
 		SimpleBlogCommon::Init();
 
@@ -25,11 +25,11 @@ class SimpleBlog extends SimpleBlogCommon{
 
 		if( common::LoggedIn() ){
 
-			$page->admin_links[]		= array('Special_Blog','Blog Home');
-			$page->admin_links[]		= array('Admin_Blog','New Blog Post','cmd=new_form');
-			$page->admin_links[]		= array('Admin_Blog','Configuration');
+			$page->admin_links[]		= array('Special_Blog',$blogmsg['Blog Home']);
+			$page->admin_links[]		= array('Admin_Blog',$blogmsg['New Blog Post'],'cmd=new_form');
+			$page->admin_links[]		= array('Admin_Blog',$blogmsg['Configuration']);
 			$page->admin_links[]		= array('Admin_Theme_Content',$langmessage['editable_text'],'cmd=addontext&addon='.urlencode($addonFolderName),' name="gpabox" ');
-			$label						= 'Number of Posts: '. SimpleBlogCommon::$data['post_count'];
+			$label						= $this->blogmsg['Number of Posts: ']. SimpleBlogCommon::$data['post_count'];
 			$page->admin_links[$label]	= '';
 			$cmd						= common::GetCommand();
 
@@ -56,8 +56,9 @@ class SimpleBlog extends SimpleBlogCommon{
 		$this->ShowPage();
 
 		if( common::LoggedIn() && !file_exists(self::$index_file) ){
-			echo '<p>Congratulations on successfully installing Simple Blog for gpEasy.</p> ';
-			echo '<p>You\'ll probably want to get started by '.common::Link('Admin_Blog','creating a blog post','cmd=new_form').'.</p>';
+//			echo '<p>Congratulations on successfully installing Simple Blog for gpEasy.</p> ';
+//			echo '<p>You\'ll probably want to get started by '.common::Link('Admin_Blog',$blogmsg['creating a blog post'],'cmd=new_form').'.</p>';
+			echo $blogmsg['success_install'].$blogmsg['creating a blog post'].'.</p>';
 		}
 
 	}
@@ -152,11 +153,12 @@ class SimpleBlog extends SimpleBlogCommon{
 	 *
 	 */
 	public function ShowPage(){
-		global $page;
+		global $page, $blogmsg;
 
 		$per_page		= SimpleBlogCommon::$data['per_page'];
 		$page_num		= 0;
 		$expected_q		= '';
+		$newer_exist	= false;
 		if( isset($_GET['page']) && is_numeric($_GET['page']) ){
 			$page_num		= (int)$_GET['page'];
 			$expected_q		= 'page='.$page_num;
@@ -181,19 +183,25 @@ class SimpleBlog extends SimpleBlogCommon{
 
 		if( $page_num > 0 ){
 
-			$html = common::Link('Special_Blog','%s');
-			echo gpOutput::GetAddonText('Blog Home',$html);
-			echo '&nbsp;';
+//			$html = common::Link('Special_Blog','%s');
+//			echo gpOutput::GetAddonText('Blog Home',$html);
+			echo common::Link('Special_Blog',$blogmsg['Blog Home']);
+			echo '&nbsp;|&nbsp;';
 
-			$html = common::Link('Special_Blog','%s','page='.($page_num-1),'class="blog_newer"');
-			echo gpOutput::GetAddonText('Newer Entries',$html);
-			echo '&nbsp;';
-
+//			$html = common::Link('Special_Blog','%s','page='.($page_num-1),'class="blog_newer"');
+//			echo gpOutput::GetAddonText('Newer Entries',$html);
+			echo common::Link('Special_Blog',$blogmsg['Newer Entries'],'page='.($page_num-1),'class="blog_newer"');
+//			echo '&nbsp;';
+			$newer_exist = true;
 		}
 
 		if( ( ($page_num+1) * $per_page) < SimpleBlogCommon::$data['post_count'] ){
-			$html = common::Link('Special_Blog','%s','page='.($page_num+1),'class="blog_older"');
-			echo gpOutput::GetAddonText('Older Entries',$html);
+			if($newer_exist){
+				echo '&nbsp;|&nbsp;';
+			}
+//			$html = common::Link('Special_Blog','%s','page='.($page_num+1),'class="blog_older"');
+//			echo gpOutput::GetAddonText('Older Entries',$html);
+			echo common::Link('Special_Blog',$blogmsg['Older Entries'],'page='.($page_num+1),'class="blog_older"');
 		}
 
 		echo '</p>';
@@ -219,7 +227,8 @@ class SimpleBlog extends SimpleBlogCommon{
 	 *
 	 */
 	public function ShowPostContent( $post_index ){
-
+		global $blogmsg;
+		
 		if( !common::LoggedIn() && SimpleBlogCommon::AStrGet('drafts',$post_index) ){
 			return false;
 		}
@@ -237,11 +246,11 @@ class SimpleBlog extends SimpleBlogCommon{
 		$header = '<h2 id="blog_post_'.$post_index.'">';
 		if( SimpleBlogCommon::AStrGet('drafts',$post_index) ){
 			$header .= '<span style="opacity:0.3;">';
-			$header .= gpOutput::SelectText('Draft');
+			$header .= $blogmsg['Draft'];
 			$header .= '</span> ';
 		}elseif( $post['time'] > time() ){
 			$header .= '<span style="opacity:0.3;">';
-			$header .= gpOutput::SelectText('Pending');
+			$header .= $blogmsg['Pending'];
 			$header .= '</span> ';
 		}
 
@@ -279,7 +288,7 @@ class SimpleBlog extends SimpleBlogCommon{
 
 			if( count($temp) ){
 				echo '<div class="category_container">';
-				echo gpOutput::GetAddonText('Categories').' ';
+				echo $blogmsg['Categories'].' ';
 				echo implode(', ',$temp);
 				echo '</div>';
 			}
@@ -340,7 +349,7 @@ class SimpleBlog extends SimpleBlogCommon{
 	 * @param string $id
 	 */
 	public static function EditLinks($post_index, &$class, &$id){
-		global $langmessage;
+		global $langmessage, $blogmsg;
 
 		$query		= 'du'; //dummy parameter
 
@@ -362,15 +371,15 @@ class SimpleBlog extends SimpleBlogCommon{
 
 			$comments_closed = SimpleBlogCommon::AStrGet('comments_closed',$post_index);
 			if( $comments_closed ){
-				$label = gpOutput::SelectText('Open Comments');
+				$label = $blogmsg['Open Comments'];
 				echo SimpleBlogCommon::PostLink($post_index,$label,'cmd=opencomments','name="cnreq" style="display:none"');
 			}else{
-				$label = gpOutput::SelectText('Close Comments');
+				$label = $blogmsg['Close Comments'];
 				echo SimpleBlogCommon::PostLink($post_index,$label,'cmd=closecomments','name="cnreq" style="display:none"');
 			}
 		}
 
-		echo common::Link('Admin_Blog','New Blog Post','cmd=new_form',' style="display:none"');
+		echo common::Link('Admin_Blog',$blogmsg['New Blog Post'],'cmd=new_form',' style="display:none"');
 		echo common::Link('Admin_Blog',$langmessage['administration'],'',' style="display:none"');
 		echo '</span>';
 	}
@@ -380,6 +389,7 @@ class SimpleBlog extends SimpleBlogCommon{
 	 *
 	 */
 	public function AbbrevContent( $content, $post_index, $limit = 0 ){
+		global $blogmsg;
 
 		if( !is_numeric($limit) || $limit == 0 ){
 			return $content;
@@ -397,11 +407,9 @@ class SimpleBlog extends SimpleBlogCommon{
 			$limit = $pos;
 		}
 		$content = mb_substr($content,0,$limit).' ... ';
-		$label = gpOutput::SelectText('Read More');
+		$label = $blogmsg['Read More'];
 		return $content . SimpleBlogCommon::PostLink($post_index,$label);
 	}
 
 
 }
-
-

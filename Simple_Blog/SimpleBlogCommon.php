@@ -23,14 +23,14 @@ class SimpleBlogCommon{
 
 	public static $data_dir;
 
-
-
+	public static $blogmsg		= array();
 	/**
 	 * When SimpleBlogCommon is created as an object, it will regenerate the static files
 	 *
 	 */
 	public function __construct(){
 		self::Init();
+		self::LoadLanguage();
 		self::GenStaticContent();
 	}
 
@@ -39,7 +39,7 @@ class SimpleBlogCommon{
 	 *
 	 */
 	public static function Init(){
-		global $addonPathData;
+		global $addonPathData, $config;
 
 		if( isset(self::$data) ){
 			return;
@@ -54,7 +54,8 @@ class SimpleBlogCommon{
 			self::$root_url = common::SpecialHref('Special_Blog');
 		}
 
-
+		setlocale(LC_ALL, "hu_HU");
+		self::LoadLanguage();
 		self::GetBlogData();
 		self::AddCSS();
 
@@ -535,11 +536,7 @@ class SimpleBlogCommon{
 		$count = SimpleBlogCommon::AStrGet('comment_counts',$post_index);
 		if( $count > 0 ){
 			$blog_comments = '<span class="simple_blog_comments">';
-			if( $cacheable ){
-				$blog_comments .= gpOutput::SelectText('Comments');
-			}else{
-				$blog_comments .= gpOutput::GetAddonText('Comments');
-			}
+			$blog_comments .= $blogmsg['Comments'];
 			$blog_comments .= ': '.$count;
 			$blog_comments .= '</span>';
 		}
@@ -577,10 +574,10 @@ class SimpleBlogCommon{
 	 *
 	 */
 	public static function load_blog_categories(){
-		global $addonPathData;
+		global $addonPathData,$blogmsg;
 		$categories_file = $addonPathData.'/categories.php';
 
-		$categories = array( 'a' => array( 'ct'=>'Unsorted posts', 'visible'=>false,'posts'=>array() ) );
+		$categories = array( 'a' => array( 'ct'=>$blogmsg['Unsorted posts'], 'visible'=>false,'posts'=>array() ) );
 		if( file_exists($categories_file) ){
 			include($categories_file);
 		}
@@ -937,7 +934,16 @@ class SimpleBlogCommon{
 		return array_combine($matches[1],$matches[2]);
 	}
 
+	public static function LoadLanguage(){
+
+		global $addonPathCode, $config, $blogmsg;
+
+		$langFile = $addonPathCode.'/lang/lang.'.$config['language'].'.php';
+		if(file_exists($langFile)){
+			include($langFile);
+		}else{
+			include($addonPathCode.'/lang/lang.en.php');
+		}
+	}
 
 }
-
-

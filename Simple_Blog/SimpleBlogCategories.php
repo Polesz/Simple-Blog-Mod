@@ -127,9 +127,10 @@ class BlogCategories extends SimpleBlog{
 
 
 	function ShowCategories(){
+		global $blogmsg;
 
 		echo '<h2>';
-		echo gpOutput::GetAddonText('Categories');
+		echo $blogmsg['Categories'];
 		echo '</h2>';
 
 

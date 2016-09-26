@@ -121,11 +121,11 @@ class AdminSimpleBlogPage extends SimpleBlogPage{
 	 *
 	 */
 	function SaveInline(){
-		global $page, $langmessage;
+		global $page, $langmessage, $blogmsg;
 		$page->ajaxReplace = array();
 
 		if( $this->post === false || empty($_POST['gpcontent']) ){
-			message($langmessage['OOPS'].' (No Post)');
+			message($langmessage['OOPS'].$blogmsg[' (No Post)']);
 			return;
 		}
 
@@ -148,14 +148,14 @@ class AdminSimpleBlogPage extends SimpleBlogPage{
 	 *
 	 */
 	static function SavePost($post_index, $post){
-		global $gpAdmin;
+		global $gpAdmin, $blogmsg;
 
 		gpFiles::cleanText($post['content']);
 		$post['username']		= $gpAdmin['username'];
 		$post_file				= SimpleBlogCommon::PostFilePath($post_index);
 
 		if( !gpFiles::SaveArray($post_file,'post',$post) ){
-			message($langmessage['OOPS'].' (Post not saved)');
+			message($langmessage['OOPS'].$blogmsg[' (Post not saved)']);
 			return false;
 		}
 
