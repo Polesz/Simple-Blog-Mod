@@ -54,7 +54,7 @@ class SimpleBlogCommon{
 			self::$root_url = common::SpecialHref('Special_Blog');
 		}
 
-		setlocale(LC_ALL, "hu_HU");
+//		setlocale(LC_ALL, "hu_HU");
 		self::LoadLanguage();
 		self::GetBlogData();
 		self::AddCSS();
