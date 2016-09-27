@@ -1,0 +1,1440 @@
+diff -Naur Simple_Blog_original/Addon.ini Simple_Blog/Addon.ini
+--- Simple_Blog_original/Addon.ini	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Addon.ini	2016-09-26 17:51:47.306017531 +0200
+@@ -1,7 +1,7 @@
+ 
+ Addon_Name			= 'Simple Blog'
+ Addon_Unique_ID		= 17
+-Addon_Version		= 3.0.4
++Addon_Version		= 3.0.4.1
+ min_gpeasy_version	= 3.5.3
+ 
+ ; may contain some html: <div>,<p>,<a>,<b>,<br/>,<span>,<tt>,<em>,<i>,<b>,<sup>,<sub>,<strong>,<u>
+diff -Naur Simple_Blog_original/Admin/Admin.php Simple_Blog/Admin/Admin.php
+--- Simple_Blog_original/Admin/Admin.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/Admin.php	2016-09-26 17:51:47.306017531 +0200
+@@ -25,13 +25,13 @@
+ 	 * @param string $current
+ 	 */
+ 	function Heading($current){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		$options = array(
+-			'Admin_Blog'			=> 'Posts',
++			'Admin_Blog'			=> $blogmsg['Posts'],
+ 			'Admin_BlogConfig'		=> $langmessage['configuration'],
+-			'Admin_BlogCategories'	=> 'Categories',
+-			'Admin_BlogComments'	=> gpOutput::SelectText('Comments'),
++			'Admin_BlogCategories'	=> $blogmsg['Categories'],
++			'Admin_BlogComments'	=> $blogmsg['Comments'],
+ 			);
+ 
+ 		$links = array();
+@@ -43,10 +43,10 @@
+ 			}
+ 		}
+ 
+-		echo common::Link('Admin_Blog','New Blog Post','cmd=new_form',' class="gpsubmit" style="float:right"');
++		echo common::Link('Admin_Blog',$blogmsg['New Blog Post'],'cmd=new_form',' class="gpsubmit" style="float:right"');
+ 
+ 		echo '<h2 class="hmargin">';
+-		$label = gpOutput::SelectText('Blog');
++		$label = $blogmsg['Blog'];
+ 		echo common::Link('Special_Blog',$label);
+ 		echo ' &#187; ';
+ 		echo implode('<span>|</span>',$links);
+@@ -57,4 +57,4 @@
+ 
+ 
+ 
+-}
+\ No newline at end of file
++}
+diff -Naur Simple_Blog_original/Admin/Categories.php Simple_Blog/Admin/Categories.php
+--- Simple_Blog_original/Admin/Categories.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/Categories.php	2016-09-26 17:51:47.307017531 +0200
+@@ -10,7 +10,7 @@
+ 
+ 
+ 	function __construct(){
+-		global $langmessage, $addonRelativeCode, $addonFolderName, $page;
++		global $langmessage, $addonRelativeCode, $addonFolderName, $page, $blogmsg;
+ 
+ 		parent::__construct();
+ 
+@@ -42,7 +42,7 @@
+ 		// print all categories and settings
+ 		echo '<form name="categories" action="'.common::GetUrl('Admin_BlogCategories').'" method="post">';
+ 		echo '<table class="bordered">';
+-		echo '<tr><th>&nbsp;</th><th>Category</th><th>Number of Posts</th><th>Visible</th><th>Options</th></tr>';
++		echo '<tr><th>&nbsp;</th><th>'.$blogmsg['Category'].'</th><th>'.$blogmsg['Number of Posts'].'</th><th>'.$blogmsg['Visible'].'</th><th>'.$blogmsg['Options'].'</th></tr>';
+ 
+ 		echo '<tbody class="sortable_table">';
+ 		foreach( $this->categories as $catindex => $catname ){
+@@ -64,7 +64,7 @@
+ 
+ 			echo ' <input type="checkbox" name="catvis['.$catindex.']"'.$checked.'/> ';
+ 			echo '</td><td>';
+-			echo common::Link('Admin_BlogCategories',$langmessage['delete'],'cmd=delete_category&index='.$catindex,' name="postlink" class="gpconfirm" title="Delete this Category?" ');
++			echo common::Link('Admin_BlogCategories',$langmessage['delete'],'cmd=delete_category&index='.$catindex,' name="postlink" class="gpconfirm" title="'.$blogmsg['Delete this Category?'].'" ');
+ 			echo '</td></tr>';
+ 		}
+ 		echo '</tbody>';
+@@ -74,7 +74,7 @@
+ 		echo '<input type="hidden" name="cmd" value="save_categories" />';
+ 		echo '<input type="submit" value="'.$langmessage['save_changes'].'" class="gpsubmit"/>';
+ 		echo ' &nbsp; ';
+-		echo common::Link('Admin_BlogCategories','Add New Category','cmd=new_category',' name="gpabox" ');
++		echo common::Link('Admin_BlogCategories',$blogmsg['Add New Category'],'cmd=new_category',' name="gpabox" ');
+ 		echo '</p>';
+ 		echo '</form>';
+ 
+@@ -153,7 +153,7 @@
+ 
+ 		$new_title = htmlspecialchars(trim($_POST['new_category']));
+ 		if( empty($new_title) ){
+-			message($langmessage['OOPS'].' (Empty category title)');
++			message($langmessage['OOPS'].$blogmsg[' (Empty category title)']);
+ 			return false;
+ 		}
+ 
+@@ -179,7 +179,7 @@
+ 	function NewCategory(){
+ 		global $langmessage;
+ 		echo '<div class="inline_box">';
+-		echo '<h3>Add New Category</h3>';
++		echo '<h3>'.$blogmsg['Add New Category'].'</h3>';
+ 		echo '<form name="addcategory" action="'.common::GetUrl('Admin_BlogCategories').'" method="post">';
+ 		echo '<p>';
+ 		echo '<input type="hidden" name="cmd" value="save_new_category" />';
+@@ -215,16 +215,16 @@
+ 	 *
+ 	 */
+ 	function DeleteCategory(){
+-		global $langmessage;
++		global $langmessage,$blogmsg;
+ 
+ 		if( !isset($_POST['index']) ){
+-			message($langmessage['OOPS'].' (Invalid Index)');
++			message($langmessage['OOPS'].$blogmsg[' (Invalid Index)']);
+ 			return false;
+ 		}
+ 
+ 		$index = $_POST['index'];
+ 		if( !isset($this->categories[$index]) ){
+-			message($langmessage['OOPS'].' (Invalid Index)');
++			message($langmessage['OOPS'].$blogmsg[' (Invalid Index)']);
+ 			return false;
+ 		}
+ 
+diff -Naur Simple_Blog_original/Admin/Comments.php Simple_Blog/Admin/Comments.php
+--- Simple_Blog_original/Admin/Comments.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/Comments.php	2016-09-26 17:51:47.307017531 +0200
+@@ -32,7 +32,7 @@
+ 	}
+ 
+ 	function ShowRecent(){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 
+ 		$this->Heading('Admin_BlogComments');
+@@ -40,11 +40,11 @@
+ 
+ 		echo '<table style="width:100%" class="bordered">';
+ 		echo '<tr><th>';
+-		echo 'Comment';
++		echo $blogmsg['Comment'];
+ 		echo '</th><th>';
+-		echo 'Time / Website';
++		echo $blogmsg['Time / Website'];
+ 		echo '</th><th>';
+-		echo 'Options';
++		echo $blogmsg['Options'];
+ 		echo '</th></tr>';
+ 
+ 		uasort($this->cache, array('SimpleBlogComments','Sort') );
+diff -Naur Simple_Blog_original/Admin/Configuration.php Simple_Blog/Admin/Configuration.php
+--- Simple_Blog_original/Admin/Configuration.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/Configuration.php	2016-09-26 17:51:47.307017531 +0200
+@@ -99,7 +99,7 @@
+ 	 *
+ 	 */
+ 	function Config(){
+-		global $langmessage, $addonFolderName, $gpversion;
++		global $langmessage, $addonFolderName, $gpversion, $blogmsg;
+ 
+ 
+ 		$defaults = SimpleBlogCommon::Defaults();
+@@ -113,22 +113,22 @@
+ 		echo '<form class="renameform" action="'.common::GetUrl('Admin_BlogConfig').'" method="post">';
+ 		echo '<table class="bordered full_width">';
+ 		echo '<tr><th>';
+-		echo 'Option';
++		echo $blogmsg['Option'];
+ 		echo '</th><th>';
+-		echo 'Value';
++		echo $blogmsg['Value'];
+ 		echo '</th><th>';
+-		echo 'Default';
++		echo $blogmsg['Default'];
+ 		echo '</th></tr>';
+ 
+ 
+ 		$options = self::Options();
+ 
+ 		//Pretty Urls
+-		echo '<tr><td>Urls</td><td>';
++		echo '<tr><td>'.$blogmsg['Urls'].'</td><td>';
+ 		if( version_compare($gpversion,'4.0','>=') ){
+ 			self::Radio('urls',$options['urls'],$array['urls']);
+ 		}else{
+-			echo 'Available in gpEasy 4.0+';
++			echo $blogmsg['Available in gpEasy 4.0+'];
+ 		}
+ 		echo '</td><td>';
+ 		echo $defaults['urls'];
+@@ -137,9 +137,9 @@
+ 
+ 		//Date Format
+ 		echo '<tr><td>';
+-		echo 'Date Format';
++		echo $blogmsg['Date Format'];
+ 		//echo ' (<a href="http://php.net/manual/en/function.date.php" target="_blank">About</a>)';
+-		echo ' (<a href="http://www.php.net/manual/en/function.strftime.php" target="_blank">About</a>)';
++		echo ' (<a href="http://www.php.net/manual/en/function.strftime.php" target="_blank">'.$blogmsg['About'].'</a>)';
+ 		echo '</td><td>';
+ 		//echo '<input type="text" name="date_format" size="20" value="'.htmlspecialchars($array['date_format']).'" class="gpinput" />';
+ 		echo '<input type="text" name="strftime_format" value="'.htmlspecialchars($array['strftime_format']).'" class="gpinput" />';
+@@ -150,7 +150,7 @@
+ 
+ 		//Subtitle Separator
+ 		echo '<tr><td>';
+-		echo 'Subtitle Separator';
++		echo $blogmsg['Subtitle Separator'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="subtitle_separator" size="20" value="'.htmlspecialchars($array['subtitle_separator']).'" class="gpinput" />';
+ 		echo '</td><td>';
+@@ -159,7 +159,7 @@
+ 
+ 
+ 		//Entries Per Page
+-		echo '<tr><td>Entries Per Page</td><td>';
++		echo '<tr><td>'.$blogmsg['Entries Per Page'].'</td><td>';
+ 		echo '<input type="text" name="per_page" value="'.htmlspecialchars($array['per_page']).'" class="gpinput" />';
+ 		echo '</td><td>';
+ 		echo $defaults['per_page'];
+@@ -168,7 +168,7 @@
+ 
+ 		//Entries Abbreviation Length
+ 		echo '<tr><td>';
+-		echo 'Entries Abbreviation Length';
++		echo $blogmsg['Entries Abbreviation Length'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="post_abbrev" value="'.htmlspecialchars($array['post_abbrev']).'" class="gpinput" />';
+ 		echo '</td><td>';
+@@ -178,7 +178,7 @@
+ 
+ 		//Image in Abbrevation
+ 		echo '<tr><td>';
+-		echo 'Image in Abbrevation';
++		echo $blogmsg['Image in Abbrevation'];
+ 		echo '</td><td>';
+ 		if( $array['abbrev_image'] ){
+ 			echo '<input type="checkbox" name="abbrev_image" value="allow" checked="checked" />';
+@@ -190,7 +190,7 @@
+ 
+ 		//Categories in Abbreviation
+ 		echo '<tr><td>';
+-		echo 'Categories in Abbrevation';
++		echo $blogmsg['Categories in Abbrevation'];
+ 		echo '</td><td>';
+ 		if( $array['abbrev_cat'] ){
+ 			echo '<input type="checkbox" name="abbrev_cat" value="allow" checked="checked" />';
+@@ -202,12 +202,12 @@
+ 
+ 		//Comments
+ 		echo '<tr><th colspan="3">';
+-		echo 'Gadget';
++		echo $blogmsg['Gadget'];
+ 		echo '</th></tr>';
+ 
+ 		//Entries For Gadget
+ 		echo '<tr><td>';
+-		echo 'Entries For Gadget';
++		echo $blogmsg['Entries For Gadget'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="gadget_entries" value="'.htmlspecialchars($array['gadget_entries']).'" class="gpinput" />';
+ 		echo '</td><td>';
+@@ -217,7 +217,7 @@
+ 
+ 		//Gadget Abbreviation Length
+ 		echo '<tr><td>';
+-		echo 'Gadget Abbreviation Length';
++		echo $blogmsg['Gadget Abbreviation Length'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="gadget_abbrev" value="'.htmlspecialchars($array['gadget_abbrev']).'" class="gpinput" />';
+ 		echo '</td><td>';
+@@ -227,12 +227,12 @@
+ 
+ 		//Comments
+ 		echo '<tr><th colspan="3">';
+-		echo 'Feed';
++		echo $blogmsg['Feed'];
+ 		echo '</th></tr>';
+ 
+ 		//Entries For Feed
+ 		echo '<tr><td>';
+-		echo 'Entries For Feed';
++		echo $blogmsg['Entries For Feed'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="feed_entries" value="'.htmlspecialchars($array['feed_entries']).'" class="gpinput" />';
+ 		echo '</td><td>';
+@@ -242,7 +242,7 @@
+ 
+ 		//Feed Abbreviation Length
+ 		echo '<tr><td>';
+-		echo 'Feed Abbreviation Length';
++		echo $blogmsg['Feed Abbreviation Length'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="feed_abbrev" size="20" value="'.htmlspecialchars($array['feed_abbrev']).'" class="gpinput" />';
+ 		echo '</td><td>';
+@@ -252,13 +252,13 @@
+ 
+ 		//Comments
+ 		echo '<tr><th colspan="3">';
+-		echo 'Comments';
++		echo $blogmsg['Comments'];
+ 		echo '</th></tr>';
+ 
+ 
+ 		//Allow Comments
+ 		echo '<tr><td>';
+-		echo 'Allow Comments';
++		echo $blogmsg['Allow Comments'];
+ 		echo '</td><td>';
+ 		if( $array['allow_comments'] ){
+ 			echo '<input type="checkbox" name="allow_comments" value="allow" checked="checked" />';
+@@ -270,7 +270,7 @@
+ 
+ 		//Email New Comment
+ 		echo '<tr><td>';
+-		echo 'Email New Comments';
++		echo $blogmsg['Email New Comments'];
+ 		echo '</td><td>';
+ 		echo '<input type="text" name="email_comments" value="'.htmlspecialchars($array['email_comments']).'"  />';
+ 		echo '</td><td></td></tr>';
+@@ -278,7 +278,7 @@
+ 
+ 
+ 		echo '<tr><td>';
+-		echo 'Commenter Website';
++		echo $blogmsg['Commenter Website'];
+ 		echo '</td><td>';
+ 		echo '<select name="commenter_website" class="gpselect">';
+ 			if( $array['commenter_website'] == 'nofollow' ){
+@@ -290,17 +290,17 @@
+ 				echo '<option value="nofollow" selected="selected">Nofollow Link</option>';
+ 				echo '<option value="link" selected="selected">Follow Link</option>';
+ 			}else{
+-				echo '<option value="">Hide</option>';
+-				echo '<option value="nofollow">Nofollow Link</option>';
+-				echo '<option value="link">Follow Link</option>';
++				echo '<option value="">'.$blogmsg['Hide'].'</option>';
++				echo '<option value="nofollow">'.$blogmsg['Nofollow Link'].'</option>';
++				echo '<option value="link">'.$blogmsg['Follow Link'].'</option>';
+ 			}
+ 		echo '</select>';
+ 		echo '</td><td>';
+-		echo 'Hide';
++		echo $blogmsg['Hide'];
+ 		echo '</td></tr>';
+ 
+ 		echo '<tr><td>';
+-		echo 'reCaptcha';
++		echo $blogmsg['reCaptcha'];
+ 		echo '</td><td>';
+ 
+ 		if( !gp_recaptcha::isActive() ){
+@@ -331,7 +331,7 @@
+ 		echo '<p style="text-align:center">';
+ 			echo common::Link('Admin_Theme_Content',$langmessage['editable_text'],'cmd=addontext&addon='.urlencode($addonFolderName),' title="'.urlencode($langmessage['editable_text']).'" name="gpabox" ');
+ 			echo ' &nbsp; &nbsp; ';
+-			echo common::Link('Admin_BlogConfig','Regenerate Gadget','cmd=regen',' name="creq"');
++			echo common::Link('Admin_BlogConfig',$blogmsg['Regenerate Gadget'],'cmd=regen',' name="creq"');
+ 		echo '</p>';
+ 
+ 		echo '</form>';
+diff -Naur Simple_Blog_original/Admin/Posts.php Simple_Blog/Admin/Posts.php
+--- Simple_Blog_original/Admin/Posts.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/Posts.php	2016-09-26 17:51:47.307017531 +0200
+@@ -9,6 +9,8 @@
+ 
+ 	public function __construct(){
+ 		global $langmessage, $page;
++		
++
+ 		parent::__construct();
+ 
+ 
+@@ -57,7 +59,7 @@
+ 	 *
+ 	 */
+ 	public function ShowPosts(){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		$this->Heading('Admin_Blog');
+ 
+@@ -102,9 +104,9 @@
+ 
+ 
+ 		echo '<table class="bordered full_width striped">';
+-		echo '<thead><tr><th></th><th>Posts ('.number_format($total_posts).')';
+-		echo '</th><th>Publish Time</th><th>Comments</th>';
+-		echo '<th>Options</th>';
++		echo '<thead><tr><th></th><th>'.$blogmsg['Posts'].' ('.number_format($total_posts).')';
++		echo '</th><th>'.$blogmsg['Publish Time'].'</th><th>'.$blogmsg['Comments'].'</th>';
++		echo '<th>'.$blogmsg['Options'].'</th>';
+ 		echo '</tr></thead>';
+ 		echo '<tbody>';
+ 		foreach($post_ids as $i => $post_id){
+@@ -112,9 +114,9 @@
+ 			//draft/pending
+ 			echo '<tr><td width="1%">';
+ 			if( isset($post_drafts[$post_id]) ){
+-				echo 'Draft';
++				echo $blogmsg['Draft'];
+ 			}elseif( $post_times[$post_id] > time() ){
+-				echo 'Pending';
++				echo $blogmsg['Pending'];
+ 			}
+ 
+ 			//title
+@@ -141,25 +143,25 @@
+ 
+ 			if( SimpleBlogCommon::$data['allow_comments'] ){
+ 				$comments_closed	= SimpleBlogCommon::AStrGet('comments_closed',$post_id);
+-				$open				= gpOutput::SelectText('Open');
+-				$close				= gpOutput::SelectText('Close');
++				$open				= $blogmsg['Open'];
++				$close				= $blogmsg['Close'];
+ 
+ 				if( $comments_closed ){
+ 					echo common::Link('Admin_Blog',$open,'cmd=opencomments&id='.$post_id,'name="cnreq"');
+ 					echo ' &nbsp; ';
+-					echo gpOutput::SelectText('Closed');
++					echo $blogmsg['Closed'];
+ 				}else{
+ 					echo $open;
+ 					echo ' &nbsp; ';
+ 					echo common::Link('Admin_Blog',$close,'cmd=closecomments&id='.$post_id,'name="cnreq"');
+ 				}
+ 			}else{
+-				echo common::Link('Admin_BlogConfig','Disabled');
++				echo common::Link('Admin_BlogConfig',$blogmsg['Disabled']);
+ 			}
+ 
+ 
+ 			echo '</td><td>';
+-			echo SimpleBlogCommon::PostLink($post_id,'View Post');
++			echo SimpleBlogCommon::PostLink($post_id,$blogmsg['View Post']);
+ 			echo ' &nbsp; ';
+ 			echo common::Link('Admin_Blog/'.$post_id,$langmessage['edit'],'cmd=edit_post');
+ 			echo ' &nbsp; ';
+@@ -177,10 +179,10 @@
+ 	 *
+ 	 */
+ 	public function AdminPost($id){
+-		global $langmessage;
++		global $langmessage,$blogmsg;
+ 
+ 		if( !ctype_digit($id) ){
+-			message($langmessage['OOPS'].' (Invalid Request)');
++			message($langmessage['OOPS'].$blogmsg[' (Invalid Request)']);
+ 			return false;
+ 		}
+ 
+@@ -188,7 +190,7 @@
+ 		$this->post_id			= $id;
+ 		$this->post				= SimpleBlogCommon::GetPostContent($id);
+ 		if( !$this->post ){
+-			message($langmessage['OOPS'].' (No Post)');
++			message($langmessage['OOPS'].$blogmsg[' (No Post)']);
+ 			return false;
+ 		}
+ 
+@@ -218,7 +220,7 @@
+ 	 *
+ 	 */
+ 	private function EditPost(){
+-		global $langmessage, $page;
++		global $langmessage, $page, $blogmsg;
+ 
+ 
+ 
+@@ -226,7 +228,7 @@
+ 		$post				= $this->post;
+ 		$_POST				+= $post;
+ 
+-		$this->PostForm('Edit Post',$_POST,'save_edit',$this->post_id);
++		$this->PostForm($blogmsg['Edit Post'],$_POST,'save_edit',$this->post_id);
+ 	}
+ 
+ 
+@@ -235,7 +237,8 @@
+ 	 *
+ 	 */
+ 	private function NewForm(){
+-		$this->PostForm('New Blog Post',$_POST);
++ 		global $blogmsg;
++		$this->PostForm($blogmsg['New Blog Post'],$_POST);
+ 	}
+ 
+ 
+@@ -248,7 +251,7 @@
+ 	 * @param int|string $post_id
+ 	 */
+ 	private function PostForm($label,&$array,$cmd='save_new',$post_id=null){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		includeFile('tool/editing.php');
+ 
+@@ -273,7 +276,7 @@
+ 		echo common::Link('Admin_Blog',$langmessage['cancel'],'',' class="gpcancel"');
+ 
+ 		if( $post_id ){
+-			echo SimpleBlogCommon::PostLink($post_id,'View Post','','target="_blank"');
++			echo SimpleBlogCommon::PostLink($post_id,$blogmsg['View Post'],'','target="_blank"');
+ 		}
+ 
+ 
+@@ -291,12 +294,12 @@
+ 		echo '<div class="sb_edit_box">';
+ 
+ 		echo '<div class="sb_edit_group">';
+-		echo '<label>Title</label>';
++		echo '<label>'.$blogmsg['Title'].'</label>';
+ 		echo '<input type="text" name="title" value="'.$array['title'].'" required class="gpinput" />';
+ 		echo '</div>';
+ 
+ 		echo '<div class="sb_edit_group">';
+-		echo '<label>Sub-Title</label>';
++		echo '<label>'.$blogmsg['Sub-Title'].'</label>';
+ 		echo '<input type="text" name="subtitle" value="'.$array['subtitle'].'" class="gpinput" />';
+ 		echo '</div>';
+ 
+@@ -310,7 +313,7 @@
+ 		echo '<label>';
+ 		echo '<input type="checkbox" name="isDraft" value="on" data-cmd="DraftCheckbox" ';
+ 		if( $array['isDraft'] ) echo 'checked="true"';
+-		echo '" /> Draft</label>';
++		echo '" /> '.$blogmsg['Draft'].'</label>';
+ 		echo '</div>';
+ 
+ 		$this->FieldPublish($array);
+@@ -351,6 +354,7 @@
+ 	 *
+ 	 */
+ 	public function FieldPublish($array){
++		global $blogmsg;
+ 
+ 		$style = '';
+ 		if( $array['isDraft'] ){
+@@ -358,14 +362,15 @@
+ 		}
+ 
+ 		echo '<div class="sb_edit_group" id="sb_field_publish" '.$style.'>';
+-		echo '<label>Publish Time</label>';
++		echo '<label>'.$blogmsg['Publish Time'].'</label>';
+ 
+ 
+ 		//month
+ 		$pub_month	= date('n',$array['time']);
+-		$months		= array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
++//		$months		= array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
++		$months		= $blogmsg['Months'];
+ 
+-		echo '<select name="pub_month" style="width:4.3em">';
++		echo '<select name="pub_month" style="width:7em">';
+ 		for($i = 1; $i <= 12; $i++){
+ 			$selected = '';
+ 			if( $i == $pub_month ){
+@@ -430,12 +435,12 @@
+ 	 *
+ 	 */
+ 	private function SaveEdit(){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 
+ 		//save to data file
+ 		if( !self::SavePost($this->post_id, $this->post) ){
+-			message($langmessage['OOPS'].' (Post not saved)');
++			message($langmessage['OOPS'].$blogmsg[' (Post not saved)']);
+ 			return false;
+ 		}
+ 
+@@ -451,7 +456,7 @@
+ 	 *
+ 	 */
+ 	public static function SavePost($post_id, $post){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		$_POST			+= array('title'=>'', 'content'=>'', 'subtitle'=>'', 'isDraft'=>'','category'=>array());
+ 		$title			= htmlspecialchars($_POST['title']);
+@@ -507,7 +512,7 @@
+ 		self::UpdatePostCategories($post_id);	//find and update the edited post in categories and archives
+ 
+ 		if( !SimpleBlogCommon::SaveIndex() ){
+-			message($langmessage['OOPS'].' (Index not saved)');
++			message($langmessage['OOPS'].$blogmsg[' (Index not saved)']);
+ 			return false;
+ 		}
+ 
+@@ -540,10 +545,11 @@
+ 	 *
+ 	 */
+ 	public static function ShowCategoryList( $post_id, $post ){
++		global $blogmsg;
+ 
+ 		$_POST += array('category'=>array());
+ 
+-		echo '<label>Category</label>';
++		echo '<label>'.$blogmsg['Category'].'</label>';
+ 		echo '<select name="category[]" multiple="multiple"  class="gpinput">';
+ 
+ 		$categories = SimpleBlogCommon::AStrToArray( 'categories' );
+@@ -558,7 +564,7 @@
+ 			}
+ 
+ 			if( SimpleBlogCommon::AStrGet('categories_hidden', $catindex) ){
+-				$label .= ' (Hidden)';
++				$label .= $blogmsg[' (Hidden)'];
+ 			}
+ 
+ 			echo '<option value="'.$catindex.'" '.$selected.'>'.$label.'</option>';
+diff -Naur Simple_Blog_original/Admin/SimpleBlogPage.php Simple_Blog/Admin/SimpleBlogPage.php
+--- Simple_Blog_original/Admin/SimpleBlogPage.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/SimpleBlogPage.php	2016-09-26 17:51:47.308017531 +0200
+@@ -121,11 +121,11 @@
+ 	 *
+ 	 */
+ 	function SaveInline(){
+-		global $page, $langmessage;
++		global $page, $langmessage, $blogmsg;
+ 		$page->ajaxReplace = array();
+ 
+ 		if( $this->post === false || empty($_POST['gpcontent']) ){
+-			message($langmessage['OOPS'].' (No Post)');
++			message($langmessage['OOPS'].$blogmsg[' (No Post)']);
+ 			return;
+ 		}
+ 
+@@ -148,14 +148,14 @@
+ 	 *
+ 	 */
+ 	static function SavePost($post_index, $post){
+-		global $gpAdmin;
++		global $gpAdmin, $blogmsg;
+ 
+ 		gpFiles::cleanText($post['content']);
+ 		$post['username']		= $gpAdmin['username'];
+ 		$post_file				= SimpleBlogCommon::PostFilePath($post_index);
+ 
+ 		if( !gpFiles::SaveArray($post_file,'post',$post) ){
+-			message($langmessage['OOPS'].' (Post not saved)');
++			message($langmessage['OOPS'].$blogmsg[' (Post not saved)']);
+ 			return false;
+ 		}
+ 
+diff -Naur Simple_Blog_original/Admin/StaticGenerator.php Simple_Blog/Admin/StaticGenerator.php
+--- Simple_Blog_original/Admin/StaticGenerator.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/Admin/StaticGenerator.php	2016-09-26 17:51:47.308017531 +0200
+@@ -21,7 +21,7 @@
+ 	 *
+ 	 */
+ 	static function GenFeed(){
+-		global $config, $addonFolderName, $dirPrefix;
++		global $config, $addonFolderName, $dirPrefix, $blogmsg;
+ 		ob_start();
+ 
+ 		$atomFormat = 'Y-m-d\TH:i:s\Z';
+@@ -63,7 +63,7 @@
+ 			$content =& $post['content'];
+ 			if( (SimpleBlogCommon::$data['feed_abbrev']> 0) && (mb_strlen($content) > SimpleBlogCommon::$data['feed_abbrev']) ){
+ 				$content = mb_substr($content,0,SimpleBlogCommon::$data['feed_abbrev']).' ... ';
+-				$label = gpOutput::SelectText('Read More');
++				$label = $blogmsg['Read More'];
+ 				$content .= '<a href="'.$server.SimpleBlogCommon::PostUrl($post_index,$label).'">'.$label.'</a>';
+ 			}
+ 
+@@ -100,14 +100,14 @@
+ 	 *
+ 	 */
+ 	static function GenGadget(){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		$posts = array();
+ 		$show_posts = SimpleBlogCommon::WhichPosts(0,SimpleBlogCommon::$data['gadget_entries']);
+ 
+ 
+ 		ob_start();
+-		$label = gpOutput::SelectText('Blog');
++		$label = $blogmsg['Blog'];
+ 		if( !empty($label) ){
+ 			echo '<h3>';
+ 			echo common::Link('Special_Blog',$label);
+@@ -142,7 +142,7 @@
+ 				}
+ 				$content = mb_substr($content,0,$cut).' ... ';
+ 
+-				$label = gpOutput::SelectText('Read More');
++				$label = $blogmsg['Read More'];
+ 				$content .= SimpleBlogCommon::PostLink($post_index,$label);
+ 			}
+ 
+@@ -154,7 +154,7 @@
+ 
+ 		if( SimpleBlogCommon::$data['post_count'] > 3 ){
+ 
+-			$label = gpOutput::SelectText('More Blog Entries');
++			$label = $blogmsg['More Blog Entries'];
+ 			echo common::Link('Special_Blog',$label);
+ 		}
+ 
+@@ -215,7 +215,6 @@
+ 	 */
+ 	static function GenArchiveGadget(){
+ 		global $addonPathData;
+-
+ 		//get list of posts and times
+ 		$list = SimpleBlogCommon::AStrToArray( 'post_times' );
+ 		if( !count($list) ) return;
+diff -Naur Simple_Blog_original/ArchivesGadget.php Simple_Blog/ArchivesGadget.php
+--- Simple_Blog_original/ArchivesGadget.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/ArchivesGadget.php	2016-09-26 17:51:47.308017531 +0200
+@@ -6,7 +6,7 @@
+ class SimpleBlogArchives{
+ 
+ 	function __construct(){
+-		global $addonPathData;
++		global $addonPathData, $blogmsg;
+ 
+ 		SimpleBlogCommon::AddCSS();
+ 
+@@ -29,7 +29,7 @@
+ 		echo '<div class="simple_blog_gadget"><div>';
+ 
+ 		echo '<span class="simple_blog_gadget_label">';
+-		echo gpOutput::GetAddonText('Archives');
++		echo $blogmsg['Archives'];
+ 		echo '</span>';
+ 		echo $content;
+ 		echo '</div></div>';
+diff -Naur Simple_Blog_original/CategoriesGadget.php Simple_Blog/CategoriesGadget.php
+--- Simple_Blog_original/CategoriesGadget.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/CategoriesGadget.php	2016-09-26 17:51:47.308017531 +0200
+@@ -6,7 +6,7 @@
+ class SimpleBlogCategories{
+ 
+ 	function __construct(){
+-		global $addonPathData;
++		global $addonPathData, $blogmsg;
+ 
+ 		SimpleBlogCommon::AddCSS();
+ 
+@@ -29,7 +29,7 @@
+ 
+ 		echo '<div class="simple_blog_gadget"><div>';
+ 		echo '<span class="simple_blog_gadget_label">';
+-		echo gpOutput::GetAddonText('Categories');
++		echo $blogmsg['Categories'];
+ 		echo '</span>';
+ 		echo $content;
+ 		echo '</div></div>';
+diff -Naur Simple_Blog_original/SimpleBlog.php Simple_Blog/SimpleBlog.php
+--- Simple_Blog_original/SimpleBlog.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/SimpleBlog.php	2016-09-26 17:51:47.309017531 +0200
+@@ -13,7 +13,7 @@
+ 	public $showing_category = false;
+ 
+ 	public function __construct(){
+-		global $page, $langmessage, $addonFolderName;
++		global $page, $langmessage, $addonFolderName,$blogmsg;
+ 
+ 		SimpleBlogCommon::Init();
+ 
+@@ -25,11 +25,11 @@
+ 
+ 		if( common::LoggedIn() ){
+ 
+-			$page->admin_links[]		= array('Special_Blog','Blog Home');
+-			$page->admin_links[]		= array('Admin_Blog','New Blog Post','cmd=new_form');
+-			$page->admin_links[]		= array('Admin_Blog','Configuration');
++			$page->admin_links[]		= array('Special_Blog',$blogmsg['Blog Home']);
++			$page->admin_links[]		= array('Admin_Blog',$blogmsg['New Blog Post'],'cmd=new_form');
++			$page->admin_links[]		= array('Admin_Blog',$blogmsg['Configuration']);
+ 			$page->admin_links[]		= array('Admin_Theme_Content',$langmessage['editable_text'],'cmd=addontext&addon='.urlencode($addonFolderName),' name="gpabox" ');
+-			$label						= 'Number of Posts: '. SimpleBlogCommon::$data['post_count'];
++			$label						= $this->blogmsg['Number of Posts: ']. SimpleBlogCommon::$data['post_count'];
+ 			$page->admin_links[$label]	= '';
+ 			$cmd						= common::GetCommand();
+ 
+@@ -56,8 +56,9 @@
+ 		$this->ShowPage();
+ 
+ 		if( common::LoggedIn() && !file_exists(self::$index_file) ){
+-			echo '<p>Congratulations on successfully installing Simple Blog for gpEasy.</p> ';
+-			echo '<p>You\'ll probably want to get started by '.common::Link('Admin_Blog','creating a blog post','cmd=new_form').'.</p>';
++//			echo '<p>Congratulations on successfully installing Simple Blog for gpEasy.</p> ';
++//			echo '<p>You\'ll probably want to get started by '.common::Link('Admin_Blog',$blogmsg['creating a blog post'],'cmd=new_form').'.</p>';
++			echo $blogmsg['success_install'].$blogmsg['creating a blog post'].'.</p>';
+ 		}
+ 
+ 	}
+@@ -152,11 +153,12 @@
+ 	 *
+ 	 */
+ 	public function ShowPage(){
+-		global $page;
++		global $page, $blogmsg;
+ 
+ 		$per_page		= SimpleBlogCommon::$data['per_page'];
+ 		$page_num		= 0;
+ 		$expected_q		= '';
++		$newer_exist	= false;
+ 		if( isset($_GET['page']) && is_numeric($_GET['page']) ){
+ 			$page_num		= (int)$_GET['page'];
+ 			$expected_q		= 'page='.$page_num;
+@@ -181,19 +183,25 @@
+ 
+ 		if( $page_num > 0 ){
+ 
+-			$html = common::Link('Special_Blog','%s');
+-			echo gpOutput::GetAddonText('Blog Home',$html);
+-			echo '&nbsp;';
+-
+-			$html = common::Link('Special_Blog','%s','page='.($page_num-1),'class="blog_newer"');
+-			echo gpOutput::GetAddonText('Newer Entries',$html);
+-			echo '&nbsp;';
+-
++//			$html = common::Link('Special_Blog','%s');
++//			echo gpOutput::GetAddonText('Blog Home',$html);
++			echo common::Link('Special_Blog',$blogmsg['Blog Home']);
++			echo '&nbsp;|&nbsp;';
++
++//			$html = common::Link('Special_Blog','%s','page='.($page_num-1),'class="blog_newer"');
++//			echo gpOutput::GetAddonText('Newer Entries',$html);
++			echo common::Link('Special_Blog',$blogmsg['Newer Entries'],'page='.($page_num-1),'class="blog_newer"');
++//			echo '&nbsp;';
++			$newer_exist = true;
+ 		}
+ 
+ 		if( ( ($page_num+1) * $per_page) < SimpleBlogCommon::$data['post_count'] ){
+-			$html = common::Link('Special_Blog','%s','page='.($page_num+1),'class="blog_older"');
+-			echo gpOutput::GetAddonText('Older Entries',$html);
++			if($newer_exist){
++				echo '&nbsp;|&nbsp;';
++			}
++//			$html = common::Link('Special_Blog','%s','page='.($page_num+1),'class="blog_older"');
++//			echo gpOutput::GetAddonText('Older Entries',$html);
++			echo common::Link('Special_Blog',$blogmsg['Older Entries'],'page='.($page_num+1),'class="blog_older"');
+ 		}
+ 
+ 		echo '</p>';
+@@ -219,7 +227,8 @@
+ 	 *
+ 	 */
+ 	public function ShowPostContent( $post_index ){
+-
++		global $blogmsg;
++		
+ 		if( !common::LoggedIn() && SimpleBlogCommon::AStrGet('drafts',$post_index) ){
+ 			return false;
+ 		}
+@@ -237,11 +246,11 @@
+ 		$header = '<h2 id="blog_post_'.$post_index.'">';
+ 		if( SimpleBlogCommon::AStrGet('drafts',$post_index) ){
+ 			$header .= '<span style="opacity:0.3;">';
+-			$header .= gpOutput::SelectText('Draft');
++			$header .= $blogmsg['Draft'];
+ 			$header .= '</span> ';
+ 		}elseif( $post['time'] > time() ){
+ 			$header .= '<span style="opacity:0.3;">';
+-			$header .= gpOutput::SelectText('Pending');
++			$header .= $blogmsg['Pending'];
+ 			$header .= '</span> ';
+ 		}
+ 
+@@ -279,7 +288,7 @@
+ 
+ 			if( count($temp) ){
+ 				echo '<div class="category_container">';
+-				echo gpOutput::GetAddonText('Categories').' ';
++				echo $blogmsg['Categories'].' ';
+ 				echo implode(', ',$temp);
+ 				echo '</div>';
+ 			}
+@@ -340,7 +349,7 @@
+ 	 * @param string $id
+ 	 */
+ 	public static function EditLinks($post_index, &$class, &$id){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		$query		= 'du'; //dummy parameter
+ 
+@@ -362,15 +371,15 @@
+ 
+ 			$comments_closed = SimpleBlogCommon::AStrGet('comments_closed',$post_index);
+ 			if( $comments_closed ){
+-				$label = gpOutput::SelectText('Open Comments');
++				$label = $blogmsg['Open Comments'];
+ 				echo SimpleBlogCommon::PostLink($post_index,$label,'cmd=opencomments','name="cnreq" style="display:none"');
+ 			}else{
+-				$label = gpOutput::SelectText('Close Comments');
++				$label = $blogmsg['Close Comments'];
+ 				echo SimpleBlogCommon::PostLink($post_index,$label,'cmd=closecomments','name="cnreq" style="display:none"');
+ 			}
+ 		}
+ 
+-		echo common::Link('Admin_Blog','New Blog Post','cmd=new_form',' style="display:none"');
++		echo common::Link('Admin_Blog',$blogmsg['New Blog Post'],'cmd=new_form',' style="display:none"');
+ 		echo common::Link('Admin_Blog',$langmessage['administration'],'',' style="display:none"');
+ 		echo '</span>';
+ 	}
+@@ -380,6 +389,7 @@
+ 	 *
+ 	 */
+ 	public function AbbrevContent( $content, $post_index, $limit = 0 ){
++		global $blogmsg;
+ 
+ 		if( !is_numeric($limit) || $limit == 0 ){
+ 			return $content;
+@@ -397,11 +407,9 @@
+ 			$limit = $pos;
+ 		}
+ 		$content = mb_substr($content,0,$limit).' ... ';
+-		$label = gpOutput::SelectText('Read More');
++		$label = $blogmsg['Read More'];
+ 		return $content . SimpleBlogCommon::PostLink($post_index,$label);
+ 	}
+ 
+ 
+ }
+-
+-
+diff -Naur Simple_Blog_original/SimpleBlogCategories.php Simple_Blog/SimpleBlogCategories.php
+--- Simple_Blog_original/SimpleBlogCategories.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/SimpleBlogCategories.php	2016-09-26 17:51:47.309017531 +0200
+@@ -127,9 +127,10 @@
+ 
+ 
+ 	function ShowCategories(){
++		global $blogmsg;
+ 
+ 		echo '<h2>';
+-		echo gpOutput::GetAddonText('Categories');
++		echo $blogmsg['Categories'];
+ 		echo '</h2>';
+ 
+ 
+diff -Naur Simple_Blog_original/SimpleBlogCommon.php Simple_Blog/SimpleBlogCommon.php
+--- Simple_Blog_original/SimpleBlogCommon.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/SimpleBlogCommon.php	2016-09-26 17:51:47.309017531 +0200
+@@ -23,14 +23,14 @@
+ 
+ 	public static $data_dir;
+ 
+-
+-
++	public static $blogmsg		= array();
+ 	/**
+ 	 * When SimpleBlogCommon is created as an object, it will regenerate the static files
+ 	 *
+ 	 */
+ 	public function __construct(){
+ 		self::Init();
++		self::LoadLanguage();
+ 		self::GenStaticContent();
+ 	}
+ 
+@@ -39,7 +39,7 @@
+ 	 *
+ 	 */
+ 	public static function Init(){
+-		global $addonPathData;
++		global $addonPathData, $config;
+ 
+ 		if( isset(self::$data) ){
+ 			return;
+@@ -54,7 +54,8 @@
+ 			self::$root_url = common::SpecialHref('Special_Blog');
+ 		}
+ 
+-
++		setlocale(LC_ALL, "hu_HU");
++		self::LoadLanguage();
+ 		self::GetBlogData();
+ 		self::AddCSS();
+ 
+@@ -535,11 +536,7 @@
+ 		$count = SimpleBlogCommon::AStrGet('comment_counts',$post_index);
+ 		if( $count > 0 ){
+ 			$blog_comments = '<span class="simple_blog_comments">';
+-			if( $cacheable ){
+-				$blog_comments .= gpOutput::SelectText('Comments');
+-			}else{
+-				$blog_comments .= gpOutput::GetAddonText('Comments');
+-			}
++			$blog_comments .= $blogmsg['Comments'];
+ 			$blog_comments .= ': '.$count;
+ 			$blog_comments .= '</span>';
+ 		}
+@@ -577,10 +574,10 @@
+ 	 *
+ 	 */
+ 	public static function load_blog_categories(){
+-		global $addonPathData;
++		global $addonPathData,$blogmsg;
+ 		$categories_file = $addonPathData.'/categories.php';
+ 
+-		$categories = array( 'a' => array( 'ct'=>'Unsorted posts', 'visible'=>false,'posts'=>array() ) );
++		$categories = array( 'a' => array( 'ct'=>$blogmsg['Unsorted posts'], 'visible'=>false,'posts'=>array() ) );
+ 		if( file_exists($categories_file) ){
+ 			include($categories_file);
+ 		}
+@@ -937,7 +934,16 @@
+ 		return array_combine($matches[1],$matches[2]);
+ 	}
+ 
++	public static function LoadLanguage(){
+ 
+-}
++		global $addonPathCode, $config, $blogmsg;
+ 
++		$langFile = $addonPathCode.'/lang/lang.'.$config['language'].'.php';
++		if(file_exists($langFile)){
++			include($langFile);
++		}else{
++			include($addonPathCode.'/lang/lang.en.php');
++		}
++	}
+ 
++}
+diff -Naur Simple_Blog_original/SimpleBlogPage.php Simple_Blog/SimpleBlogPage.php
+--- Simple_Blog_original/SimpleBlogPage.php	2016-06-06 17:14:22.000000000 +0200
++++ Simple_Blog/SimpleBlogPage.php	2016-09-26 17:51:47.309017531 +0200
+@@ -39,7 +39,7 @@
+ 	}
+ 
+ 	public function _ShowPost(){
+-		global $page;
++		global $page, $blogmsg;
+ 
+ 		$page->label = SimpleBlogCommon::Underscores( $this->post['title'] );
+ 
+@@ -54,11 +54,11 @@
+ 		$header			= '<h2 id="blog_post_'.$this->post_id.'">';
+ 		if( SimpleBlogCommon::AStrGet('drafts',$this->post_id) ){
+ 			$header		.= '<span style="opacity:0.3;">';
+-			$header		.= gpOutput::SelectText('Draft');
++			$header		.= $blogmsg['Draft'];
+ 			$header		.= '</span> ';
+ 		}elseif( $this->post['time'] > time() ){
+ 			$header .= '<span style="opacity:0.3;">';
+-			$header .= gpOutput::SelectText('Pending');
++			$header .= $blogmsg['Pending'];
+ 			$header .= '</span> ';
+ 		}
+ 
+@@ -119,6 +119,7 @@
+ 	 *
+ 	 */
+ 	public function Categories(){
++		global $blogmsg;
+ 
+ 		//blog categories
+ 		if( empty($this->post['categories']) ){
+@@ -140,7 +141,7 @@
+ 		if( count($temp) ){
+ 			echo '<div class="category_container">';
+ 			echo '<b>';
+-			echo gpOutput::GetAddonText('Categories');
++			echo $blogmsg['Categories'];
+ 			echo ':</b> ';
+ 			echo implode(', ',$temp);
+ 			echo '</div>';
+@@ -172,6 +173,7 @@
+ 	 *
+ 	 */
+ 	public function ShowComments(){
++		global $blogmsg;
+ 
+ 		$data = SimpleBlogCommon::GetCommentData($this->post_id);
+ 		if( empty($data) ){
+@@ -179,7 +181,7 @@
+ 		}
+ 
+ 		echo '<h3>';
+-		echo gpOutput::GetAddonText('Comments');
++		echo $blogmsg['Comments'];
+ 		echo '</h3>';
+ 
+ 		$this->GetCommentHtml($data);
+@@ -236,16 +238,16 @@
+ 	 *
+ 	 */
+ 	protected function GetPostedComment(){
+-		global $langmessage;
++		global $langmessage, $blogmsg;
+ 
+ 		if( empty($_POST['name']) ){
+-			$field = gpOutput::SelectText('Name');
++			$field = $blogmsg['Name'];
+ 			message($langmessage['OOPS_REQUIRED'],$field);
+ 			return false;
+ 		}
+ 
+ 		if( empty($_POST['comment']) ){
+-			$field = gpOutput::SelectText('Comment');
++			$field = $blogmsg['Comment'];
+ 			message($langmessage['OOPS_REQUIRED'],$field);
+ 			return false;
+ 		}
+@@ -275,7 +277,7 @@
+ 	 *
+ 	 */
+ 	protected function EmailComment($comment){
+-		global $gp_mailer;
++		global $gp_mailer, $blogmsg;
+ 
+ 		if( empty(SimpleBlogCommon::$data['email_comments']) ){
+ 			return;
+@@ -293,7 +295,7 @@
+ 		}
+ 		$body .= '<p>'.$comment['comment'].'</p>';
+ 
+-		$gp_mailer->SendEmail(SimpleBlogCommon::$data['email_comments'], 'New Comment', $body);
++		$gp_mailer->SendEmail(SimpleBlogCommon::$data['email_comments'],  $blogmsg['New Comment'], $body);
+ 
+ 	}
+ 
+@@ -355,10 +357,11 @@
+ 	 *
+ 	 */
+ 	public function CommentForm(){
++		global $blogmsg;
+ 
+ 		if( $this->comments_closed ){
+ 			echo '<div class="comments_closed">';
+-			echo gpOutput::GetAddonText('Comments have been closed.');
++			echo $blogmsg['Comments have been closed.'];
+ 			echo '</div>';
+ 			return;
+ 		}
+@@ -371,7 +374,7 @@
+ 		$_POST += array('name'=>'','website'=>'http://','comment'=>'');
+ 
+ 		echo '<h3>';
+-		echo gpOutput::GetAddonText('Leave Comment');
++		echo $blogmsg['Leave Comment'];
+ 		echo '</h3>';
+ 
+ 
+@@ -381,7 +384,7 @@
+ 		//name
+ 		echo '<li>';
+ 		echo '<label>';
+-		echo gpOutput::GetAddonText('Name');
++		echo $blogmsg['Name'];
+ 		echo '</label><br/>';
+ 		echo '<input type="text" name="name" class="text" value="'.htmlspecialchars($_POST['name']).'" />';
+ 		echo '</li>';
+@@ -390,7 +393,7 @@
+ 		if( !empty(SimpleBlogCommon::$data['commenter_website']) ){
+ 			echo '<li>';
+ 			echo '<label>';
+-			echo gpOutput::GetAddonText('Website');
++			echo $blogmsg['Website'];
+ 			echo '</label><br/>';
+ 			echo '<input type="text" name="website" class="text" value="'.htmlspecialchars($_POST['website']).'" />';
+ 			echo '</li>';
+@@ -400,7 +403,7 @@
+ 		//comment
+ 		echo '<li>';
+ 		echo '<label>';
+-		echo gpOutput::ReturnText('Comment');
++		echo $blogmsg['Comment'];
+ 		echo '</label><br/>';
+ 		echo '<textarea name="comment" cols="30" rows="7" >';
+ 		echo htmlspecialchars($_POST['comment']);
+@@ -422,8 +425,9 @@
+ 		//submit button
+ 		echo '<li>';
+ 		echo '<input type="hidden" name="cmd" value="Add Comment" />';
+-		$html = '<input type="submit" name="" class="submit" value="%s" />';
+-		echo gpOutput::GetAddonText('Add Comment',$html);
++//		$html = '<input type="submit" name="" class="submit" value="%s" />';
++//		echo gpOutput::GetAddonText('Add Comment',$html);
++		echo '<input type="submit" name="" class="submit" value="'.$blogmsg['Add Comment'].'" />';
+ 		echo '</li>';
+ 
+ 		echo '</ul>';
+@@ -448,6 +452,7 @@
+ 	 *
+ 	 */
+ 	public function PostLinks(){
++		global $blogmsg;
+ 
+ 		$post_key = SimpleBlogCommon::AStrKey('str_index',$this->post_id);
+ 
+@@ -455,9 +460,10 @@
+ 
+ 
+ 		//blog home
+-		$html = common::Link('Special_Blog','%s','','class="blog_home"');
+-		echo gpOutput::GetAddonText('Blog Home',$html);
+-		echo '&nbsp;';
++//		$html = common::Link('Special_Blog','%s','','class="blog_home"');
++//		echo gpOutput::GetAddonText('Blog Home',$html);
++		echo common::Link('Special_Blog',$blogmsg['Blog Home'],'','class="blog_home"');
++		echo '&nbsp;|&nbsp;';
+ 
+ 
+ 		// check for newer posts and if post is draft
+@@ -474,9 +480,10 @@
+ 			}while( $isDraft );
+ 
+ 			if( !$isDraft ){
+-				$html = SimpleBlogCommon::PostLink($next_index,'%s','','class="blog_newer"');
+-				echo gpOutput::GetAddonText('Newer Entry',$html);
+-				echo '&nbsp;';
++//				$html = SimpleBlogCommon::PostLink($next_index,'%s','','class="blog_newer"');
++//				echo gpOutput::GetAddonText('Newer Entry',$html);
++				echo common::Link($next_index,$blogmsg['Newer Entry'],'','class="blog_older"');
++				echo '&nbsp;|&nbsp;';
+ 			}
+ 		}
+ 
+@@ -497,20 +504,20 @@
+ 			}
+ 
+ 			if( !$isDraft ){
+-				$html = SimpleBlogCommon::PostLink($prev_index,'%s','','class="blog_older"');
+-				echo gpOutput::GetAddonText('Older Entry',$html);
++//				$html = SimpleBlogCommon::PostLink($prev_index,'%s','','class="blog_older"');
++//				echo gpOutput::GetAddonText('Older Entry',$html);
++				echo common::Link($prev_index,$blogmsg['Older Entry'],'','class="blog_older"');
+ 			}
+ 
+ 		}while( $isDraft );
+ 
+ 
+ 		if( common::LoggedIn() ){
+-			echo '&nbsp;';
+-			echo common::Link('Admin_Blog','New Post','cmd=new_form','class="blog_post_new"');
++			echo '&nbsp;|&nbsp;';
++			echo common::Link('Admin_Blog',$blogmsg['New Post'],'cmd=new_form','class="blog_post_new"');
+ 		}
+ 
+ 		echo '</p>';
+ 	}
+ 
+ }
+-
+diff -Naur Simple_Blog_original/lang/lang.en.php Simple_Blog/lang/lang.en.php
+--- Simple_Blog_original/lang/lang.en.php	1970-01-01 01:00:00.000000000 +0100
++++ Simple_Blog/lang/lang.en.php	2016-09-26 17:51:47.310017531 +0200
+@@ -0,0 +1,91 @@
++<?php
++defined('is_running') or die('Not an entry point...');
++
++$this->blogmsg = array(
++
++'Blog Home'						=> 'Blog Home',
++'New Blog Post'					=> 'New Blog Post',
++'Configuration'					=> 'Configuration',
++'Number of Posts: '				=> 'Number of Posts: ',
++'Edit Post'						=> 'Edit Post',
++'Unsorted posts'				=> 'Unsorted posts',
++'View Post'						=> 'View Post',
++'Title'							=> 'Title',
++'Sub-Title'						=> 'Sub-Title',
++'Draft'							=> 'Draft',
++'Admin Blog'					=> 'Admin Blog',
++'Publish Time'					=> 'Publish Time',
++'Options'						=> 'Options',
++' (Index not saved)'			=> ' (Index not saved)',
++'Category'						=> 'Category',
++' (Hidden)'						=> ' (Hidden)',
++' (Invalid Request)'			=> ' (Invalid Request)',
++' (No Post)'					=> ' (No Post)',
++'New Comment'					=> 'New Comment',
++'New Post'						=> 'New Post',
++'Option'						=> 'Option',
++'Value'							=> 'Value',
++'Default'						=> 'Default',
++'Urls'							=> 'Urls',
++'Available in gpEasy 4.0+'		=> 'Available in gpEasy 4.0+',
++'Date Format'					=> 'Date Format',
++'Number of Posts'				=> 'Number of Posts',
++'Visible'						=> 'Visible',
++'Delete this Category?'			=> 'Delete this Category?',
++'Add New Category'				=> 'Add New Category',
++' (Empty category title)'		=> ' (Empty category title)',
++' (Invalid Index)'				=> ' (Invalid Index)',
++'Comment'						=> 'Comment',
++'Time / Website'				=> 'Time / Website',
++'About'							=> 'About',
++'Subtitle Separator'			=> 'Subtitle Separator',
++'Entries Per Page'				=> 'Entries Per Page',
++'Entries Abbreviation Length'	=> 'Entries Abbreviation Length',
++'Image in Abbrevation'			=> 'Image in Abbrevation',
++'Categories in Abbrevation'		=> 'Categories in Abbrevation',
++'Gadget'						=> 'Gadget',
++'Entries For Gadget'			=> 'Entries For Gadget',
++'Gadget Abbreviation Length'	=> 'Gadget Abbreviation Length',
++'Feed'							=> 'Feed',
++'Entries For Feed'				=> 'Entries For Feed',
++'Feed Abbreviation Length'		=> 'Feed Abbreviation Length',
++'Comments'						=> 'Comments',
++'Allow Comments'				=> 'Allow Comments',
++'Email New Comments'			=> 'Email New Comments',
++'Commenter Website'				=> 'Commenter Website',
++'Hide'							=> 'Hide',
++'Nofollow Link'					=> 'Nofollow Link',
++'Follow Link'					=> 'Follow Link',
++'reCaptcha'						=> 'reCaptcha',
++'Regenerate Gadget'				=> 'Regenerate Gadget',
++' (Post not saved)'				=> ' (Post not saved)',
++'Blog',							=> 'Blog',
++'Newer Entry'					=> 'Newer Entry',
++'Newer Entries'					=> 'Newer Entries',
++'Older Entry'					=> 'Older Entry',
++'Older Entries'					=> 'Older Entries',
++'Read More'						=> 'Read More',
++'More Blog Entries'				=> 'More Blog Entries',
++'Name'							=> 'Name',
++'Website'						=> 'Website',
++'Categories'					=> 'Categories',
++'Archives'						=> 'Archives',
++'Leave Comment'					=> 'Leave Comment',
++'Add Comment'					=> 'Add Comment',
++'Comments have been closed.'	=> 'Comments have been closed.',
++'Open Comments'					=> 'Open Comments',
++'Close Comments'				=> 'Close Comments',
++'Draft'							=> 'Draft',
++'Pending'						=> 'Pending',
++'Posts'							=> 'Posts',
++'Disabled'						=> 'Disabled',
++'Months'						=> array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'),
++'success_install'				=> '<p>Congratulations on successfully installing Simple Blog for gpEasy.</p>'.
++									'<p>You\'ll probably want to get started by ',
++'creating a blog post'			=> 'creating a blog post',
++'Open'							=> 'Open',
++'Close'							=> 'Close',
++'Closed'						=> 'Closed',
++
++
++);
+diff -Naur Simple_Blog_original/lang/lang.hu.php Simple_Blog/lang/lang.hu.php
+--- Simple_Blog_original/lang/lang.hu.php	1970-01-01 01:00:00.000000000 +0100
++++ Simple_Blog/lang/lang.hu.php	2016-09-26 17:51:47.310017531 +0200
+@@ -0,0 +1,91 @@
++<?php
++defined('is_running') or die('Not an entry point...');
++
++$blogmsg = array(
++
++'Blog Home'						=> 'Blog főoldal',
++'New Blog Post'					=> 'Új blog bejegyzés',
++'Configuration'					=> 'Beállítások',
++'Number of Posts: '				=> 'Bejegyzések száma: ',
++'Edit Post'						=> 'Bejegyzés szerkesztése',
++'Unsorted posts'				=> 'Nem rendszerezett',
++'View Post'						=> 'Bejegyzés megtekintése',
++'Title'							=> 'Cím',
++'Sub-Title'						=> 'Alcím',
++'Draft'							=> 'Piszkozat',
++'Admin Blog'					=> 'Blog adminisztráció',
++'Publish Time'					=> 'Publikálás ideje',
++'Options'						=> 'Opciók',
++' (Index not saved)'			=> ' (Index nincs mentve)',
++'Category'						=> 'Kategória',
++' (Hidden)'						=> ' (Rejtett)',
++' (Invalid Request)'			=> ' (Érvénytelen kérés)',
++' (No Post)'					=> ' (Nincs bejegyzés)',
++'New Comment'					=> 'Új hozzászólás',
++'New Post'						=> 'Új bejegyzés írása',
++'Option'						=> 'Opció',
++'Value'							=> 'Érték',
++'Default'						=> 'Alapértelmezett',
++'Urls'							=> 'Link formátuma',
++'Available in gpEasy 4.0+'		=> 'Elérhető gpEasy 4.0+ -tól',
++'Date Format'					=> 'Dátum formátuma',
++'Number of Posts'				=> 'Bejegyzések száma',
++'Visible'						=> 'Látható',
++'Delete this Category?'			=> 'Törölni akarja ezt a kategóriát?',
++'Add New Category'				=> 'Új kategória hozzáadása',
++' (Empty category title)'		=> ' (Üres a kategória címe)',
++' (Invalid Index)'				=> ' (Értvénytelen index)',
++'Comment'						=> 'Hozzászólás',
++'Time / Website'				=> 'Idő / Honlap',
++'About'							=> 'További infó',
++'Subtitle Separator'			=> 'Alcím elválasztó',
++'Entries Per Page'				=> 'Bejegyzések száma egy lapon',
++'Entries Abbreviation Length'	=> 'Bejegyzés rövidítés hossza',
++'Image in Abbrevation'			=> 'Kép a rövidítésben',
++'Categories in Abbrevation'		=> 'Kategóriák a rövidítésben',
++'Gadget'						=> 'Bigyó',
++'Entries For Gadget'			=> 'Bejegyzések száma',
++'Gadget Abbreviation Length'	=> 'Rövidítés hossza',
++'Feed'							=> 'Feed (hírcsatorna)',
++'Entries For Feed'				=> 'Bejegyzések száma a hírcsatornában',
++'Feed Abbreviation Length'		=> 'Bejegyzések rövidítése',
++'Comments'						=> 'Hozzászólások',
++'Allow Comments'				=> 'Hozzászólás engedélyezése',
++'Email New Comments'			=> 'E-mail az új hozzászólásról',
++'Commenter Website'				=> 'Hozzászóló honlapja',
++'Hide'							=> 'Rejtett',
++'Nofollow Link'					=> 'Ne kövesse a linket',
++'Follow Link'					=> 'Link követése',
++'reCaptcha'						=> 'reCaptcha',
++'Regenerate Gadget'				=> 'Bigyók újragenerálása',
++' (Post not saved)'				=> ' (Bejegyzés nincs mentve)',
++'Blog'							=> 'Hírek',
++'Newer Entry'					=> 'Újabb bejegyzés',
++'Newer Entries'					=> 'Újabb bejegyzések',
++'Older Entry'					=> 'Régebbi bejegyzés',
++'Older Entries'					=> 'Régebbi bejegyzések',
++'Read More'						=> 'Olvass tovább',
++'More Blog Entries'				=> 'További blog bejegyzések',
++'Name'							=> 'Név',
++'Website'						=> 'Honlap',
++'Categories'					=> 'Kategóriák',
++'Archives'						=> 'Archívum',
++'Leave Comment'					=> 'Hozzászólás írása',
++'Add Comment'					=> 'Beküldés',
++'Comments have been closed.'	=> 'A hozzászólások le vannak zárva.',
++'Open Comments'					=> 'Nyitott hozzászólások',
++'Close Comments'				=> 'Lezárt hozzászólások',
++'Draft'							=> 'Piszkozat',
++'Pending'						=> 'Várakozó',
++'Posts'							=> 'Bejegyzések',
++'Disabled'						=> 'Letiltva',
++'Months'						=> array('Jan','Feb','Már','Ápr','Máj','Jún','Júl','Aug','Szep','Okt','Nov','Dec'),
++'success_install'				=> '<p>Gratulálunk a Simple Blog sikeresen telepítve a Typesetterhez.</p> ',
++									'<p>Első lépések: ',
++'creating a blog post'			=> 'blogbejegyzés létrehozása',
++'Open'							=> 'Nyitott',
++'Close'							=> 'Lezárt',
++'Closed'						=> 'Lezárt',
++
++
++);
