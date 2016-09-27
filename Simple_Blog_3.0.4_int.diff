@@ -1,6 +1,6 @@
 diff -Naur Simple_Blog_original/Addon.ini Simple_Blog/Addon.ini
 --- Simple_Blog_original/Addon.ini	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Addon.ini	2016-09-26 17:51:47.306017531 +0200
++++ Simple_Blog/Addon.ini	2016-09-26 16:47:50.989135424 +0200
 @@ -1,7 +1,7 @@
  
  Addon_Name			= 'Simple Blog'
@@ -12,7 +12,7 @@ diff -Naur Simple_Blog_original/Addon.ini Simple_Blog/Addon.ini
  ; may contain some html: <div>,<p>,<a>,<b>,<br/>,<span>,<tt>,<em>,<i>,<b>,<sup>,<sub>,<strong>,<u>
 diff -Naur Simple_Blog_original/Admin/Admin.php Simple_Blog/Admin/Admin.php
 --- Simple_Blog_original/Admin/Admin.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/Admin.php	2016-09-26 17:51:47.306017531 +0200
++++ Simple_Blog/Admin/Admin.php	2016-09-26 10:46:16.000000000 +0200
 @@ -25,13 +25,13 @@
  	 * @param string $current
  	 */
@@ -53,7 +53,7 @@ diff -Naur Simple_Blog_original/Admin/Admin.php Simple_Blog/Admin/Admin.php
 +}
 diff -Naur Simple_Blog_original/Admin/Categories.php Simple_Blog/Admin/Categories.php
 --- Simple_Blog_original/Admin/Categories.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/Categories.php	2016-09-26 17:51:47.307017531 +0200
++++ Simple_Blog/Admin/Categories.php	2016-09-26 07:52:55.000000000 +0200
 @@ -10,7 +10,7 @@
  
  
@@ -130,7 +130,7 @@ diff -Naur Simple_Blog_original/Admin/Categories.php Simple_Blog/Admin/Categorie
  
 diff -Naur Simple_Blog_original/Admin/Comments.php Simple_Blog/Admin/Comments.php
 --- Simple_Blog_original/Admin/Comments.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/Comments.php	2016-09-26 17:51:47.307017531 +0200
++++ Simple_Blog/Admin/Comments.php	2016-09-26 07:55:05.000000000 +0200
 @@ -32,7 +32,7 @@
  	}
  
@@ -157,7 +157,7 @@ diff -Naur Simple_Blog_original/Admin/Comments.php Simple_Blog/Admin/Comments.ph
  		uasort($this->cache, array('SimpleBlogComments','Sort') );
 diff -Naur Simple_Blog_original/Admin/Configuration.php Simple_Blog/Admin/Configuration.php
 --- Simple_Blog_original/Admin/Configuration.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/Configuration.php	2016-09-26 17:51:47.307017531 +0200
++++ Simple_Blog/Admin/Configuration.php	2016-09-26 08:56:37.000000000 +0200
 @@ -99,7 +99,7 @@
  	 *
  	 */
@@ -368,7 +368,7 @@ diff -Naur Simple_Blog_original/Admin/Configuration.php Simple_Blog/Admin/Config
  		echo '</form>';
 diff -Naur Simple_Blog_original/Admin/Posts.php Simple_Blog/Admin/Posts.php
 --- Simple_Blog_original/Admin/Posts.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/Posts.php	2016-09-26 17:51:47.307017531 +0200
++++ Simple_Blog/Admin/Posts.php	2016-09-26 13:47:58.000000000 +0200
 @@ -9,6 +9,8 @@
  
  	public function __construct(){
@@ -619,7 +619,7 @@ diff -Naur Simple_Blog_original/Admin/Posts.php Simple_Blog/Admin/Posts.php
  			echo '<option value="'.$catindex.'" '.$selected.'>'.$label.'</option>';
 diff -Naur Simple_Blog_original/Admin/SimpleBlogPage.php Simple_Blog/Admin/SimpleBlogPage.php
 --- Simple_Blog_original/Admin/SimpleBlogPage.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/SimpleBlogPage.php	2016-09-26 17:51:47.308017531 +0200
++++ Simple_Blog/Admin/SimpleBlogPage.php	2016-09-26 08:51:35.000000000 +0200
 @@ -121,11 +121,11 @@
  	 *
  	 */
@@ -653,7 +653,7 @@ diff -Naur Simple_Blog_original/Admin/SimpleBlogPage.php Simple_Blog/Admin/Simpl
  
 diff -Naur Simple_Blog_original/Admin/StaticGenerator.php Simple_Blog/Admin/StaticGenerator.php
 --- Simple_Blog_original/Admin/StaticGenerator.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/Admin/StaticGenerator.php	2016-09-26 17:51:47.308017531 +0200
++++ Simple_Blog/Admin/StaticGenerator.php	2016-09-26 13:55:22.000000000 +0200
 @@ -21,7 +21,7 @@
  	 *
  	 */
@@ -717,7 +717,7 @@ diff -Naur Simple_Blog_original/Admin/StaticGenerator.php Simple_Blog/Admin/Stat
  		if( !count($list) ) return;
 diff -Naur Simple_Blog_original/ArchivesGadget.php Simple_Blog/ArchivesGadget.php
 --- Simple_Blog_original/ArchivesGadget.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/ArchivesGadget.php	2016-09-26 17:51:47.308017531 +0200
++++ Simple_Blog/ArchivesGadget.php	2016-09-26 11:03:38.000000000 +0200
 @@ -6,7 +6,7 @@
  class SimpleBlogArchives{
  
@@ -738,7 +738,7 @@ diff -Naur Simple_Blog_original/ArchivesGadget.php Simple_Blog/ArchivesGadget.ph
  		echo '</div></div>';
 diff -Naur Simple_Blog_original/CategoriesGadget.php Simple_Blog/CategoriesGadget.php
 --- Simple_Blog_original/CategoriesGadget.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/CategoriesGadget.php	2016-09-26 17:51:47.308017531 +0200
++++ Simple_Blog/CategoriesGadget.php	2016-09-26 11:03:03.000000000 +0200
 @@ -6,7 +6,7 @@
  class SimpleBlogCategories{
  
@@ -759,7 +759,7 @@ diff -Naur Simple_Blog_original/CategoriesGadget.php Simple_Blog/CategoriesGadge
  		echo '</div></div>';
 diff -Naur Simple_Blog_original/SimpleBlog.php Simple_Blog/SimpleBlog.php
 --- Simple_Blog_original/SimpleBlog.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/SimpleBlog.php	2016-09-26 17:51:47.309017531 +0200
++++ Simple_Blog/SimpleBlog.php	2016-09-26 13:20:42.000000000 +0200
 @@ -13,7 +13,7 @@
  	public $showing_category = false;
  
@@ -931,7 +931,7 @@ diff -Naur Simple_Blog_original/SimpleBlog.php Simple_Blog/SimpleBlog.php
 -
 diff -Naur Simple_Blog_original/SimpleBlogCategories.php Simple_Blog/SimpleBlogCategories.php
 --- Simple_Blog_original/SimpleBlogCategories.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/SimpleBlogCategories.php	2016-09-26 17:51:47.309017531 +0200
++++ Simple_Blog/SimpleBlogCategories.php	2016-09-26 11:05:02.000000000 +0200
 @@ -127,9 +127,10 @@
  
  
@@ -946,7 +946,7 @@ diff -Naur Simple_Blog_original/SimpleBlogCategories.php Simple_Blog/SimpleBlogC
  
 diff -Naur Simple_Blog_original/SimpleBlogCommon.php Simple_Blog/SimpleBlogCommon.php
 --- Simple_Blog_original/SimpleBlogCommon.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/SimpleBlogCommon.php	2016-09-26 17:51:47.309017531 +0200
++++ Simple_Blog/SimpleBlogCommon.php	2016-09-27 09:01:56.000000000 +0200
 @@ -23,14 +23,14 @@
  
  	public static $data_dir;
@@ -978,7 +978,7 @@ diff -Naur Simple_Blog_original/SimpleBlogCommon.php Simple_Blog/SimpleBlogCommo
  		}
  
 -
-+		setlocale(LC_ALL, "hu_HU");
++//		setlocale(LC_ALL, "hu_HU");
 +		self::LoadLanguage();
  		self::GetBlogData();
  		self::AddCSS();
@@ -1029,7 +1029,7 @@ diff -Naur Simple_Blog_original/SimpleBlogCommon.php Simple_Blog/SimpleBlogCommo
 +}
 diff -Naur Simple_Blog_original/SimpleBlogPage.php Simple_Blog/SimpleBlogPage.php
 --- Simple_Blog_original/SimpleBlogPage.php	2016-06-06 17:14:22.000000000 +0200
-+++ Simple_Blog/SimpleBlogPage.php	2016-09-26 17:51:47.309017531 +0200
++++ Simple_Blog/SimpleBlogPage.php	2016-09-26 13:35:10.000000000 +0200
 @@ -39,7 +39,7 @@
  	}
  
@@ -1250,7 +1250,7 @@ diff -Naur Simple_Blog_original/SimpleBlogPage.php Simple_Blog/SimpleBlogPage.ph
 -
 diff -Naur Simple_Blog_original/lang/lang.en.php Simple_Blog/lang/lang.en.php
 --- Simple_Blog_original/lang/lang.en.php	1970-01-01 01:00:00.000000000 +0100
-+++ Simple_Blog/lang/lang.en.php	2016-09-26 17:51:47.310017531 +0200
++++ Simple_Blog/lang/lang.en.php	2016-09-26 13:23:54.000000000 +0200
 @@ -0,0 +1,91 @@
 +<?php
 +defined('is_running') or die('Not an entry point...');
@@ -1345,7 +1345,7 @@ diff -Naur Simple_Blog_original/lang/lang.en.php Simple_Blog/lang/lang.en.php
 +);
 diff -Naur Simple_Blog_original/lang/lang.hu.php Simple_Blog/lang/lang.hu.php
 --- Simple_Blog_original/lang/lang.hu.php	1970-01-01 01:00:00.000000000 +0100
-+++ Simple_Blog/lang/lang.hu.php	2016-09-26 17:51:47.310017531 +0200
++++ Simple_Blog/lang/lang.hu.php	2016-09-26 13:35:48.000000000 +0200
 @@ -0,0 +1,91 @@
 +<?php
 +defined('is_running') or die('Not an entry point...');
